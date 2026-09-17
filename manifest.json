@@ -1,0 +1,14 @@
+{
+  "name": "Seguimiento de tareas · 팀 업무 진척",
+  "short_name": "Tareas",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEF1F3",
+  "theme_color": "#2F5D8A",
+  "lang": "es",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
