@@ -207,7 +207,9 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
 .cal .dh{background:var(--panel-2);padding:6px;text-align:center;font-size:12px;color:var(--muted);font-weight:600;min-width:0;overflow:hidden;white-space:nowrap}
 .cal .dc{background:var(--panel);min-height:96px;padding:4px 5px;font-size:12px;min-width:0;overflow:hidden}
 .cal .dc.out{background:#F6F7F8;color:#B5BCC4}
-.cal .dc.we{background:#FAFBFB}
+.cal .dc.sun .dn,.cal .dh.sun{color:var(--s-late)}
+.cal .dc.sat .dn,.cal .dh.sat{color:var(--primary)}
+.cal .dc.out .dn{opacity:.45}
 .cal .dc.today{background:var(--amber-soft)}
 .cal .dn{font-weight:700;font-size:12px;margin-bottom:3px}
 .cal .ev{display:block;max-width:100%;padding:1px 5px;border-radius:4px;margin-bottom:2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-size:11px}
@@ -421,7 +423,7 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
    ===================================================================== */
 const SUPABASE_URL = 'https://iikkadzumopjswhzkwqw.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlpa2thZHp1bW9wanN3aHprd3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Njk1NDQsImV4cCI6MjEwNTI0NTU0NH0.WS1hNsYhPWWIOhsdodcy1wpMK08rF2X15WeTTluOygY';
-const APP_VERSION='1.6';
+const APP_VERSION='1.7';
 const DEMO = SUPABASE_URL.includes('YOUR-PROJECT');   // 키를 넣기 전에는 자동으로 데모 모드 (브라우저 저장, 샘플 데이터)
 
 /* ---------- 데모 모드: Supabase 없이 브라우저(localStorage)에서 동작 ---------- */
@@ -919,13 +921,14 @@ async function renderCal(){
   const rts=showRt?visibleRoutines().filter(t=>!fm||isOwner(t,fm)):[];
   const inst=rts.length?await ensureInstancesRange(a,b,rts):[];
   await loadEvents(a,b);
-  const first=new Date(a); first.setDate(1-((a.getDay()+6)%7)); const cells=[]; const cur=new Date(first);
+  const first=new Date(a); first.setDate(1-a.getDay()); const cells=[]; const cur=new Date(first);
   while(cells.length<42){ cells.push(new Date(cur)); cur.setDate(cur.getDate()+1); if(cells.length>=35&&cur>b) break; }
-  let html=ES('dow').map((d,i)=>`<div class="dh">${d} <small class="ko">${KO('dow')[i]}</small></div>`).join('');
+  const order=[6,0,1,2,3,4,5]; // 일요일 시작
+  let html=order.map(i=>`<div class="dh ${i===6?'sun':i===5?'sat':''}">${ES('dow')[i]} <small class="ko">${KO('dow')[i]}</small></div>`).join('');
   cells.forEach(dt=>{ const k=ymd(dt); const out=dt.getMonth()!==a.getMonth(); const i=(dt.getDay()+6)%7;
     const ends=tasks.filter(t=>t.end_date===k), starts=tasks.filter(t=>t.start_date===k&&t.end_date!==k);
     const ri=inst.filter(x=>x.due_date===k); const evs=EVENTS.filter(e=>e.date<=k&&e.end_date>=k&&(!fm||!e.member_ids||!e.member_ids.length||e.member_ids.map(Number).includes(+fm)));
-    html+=`<div class="dc ${out?'out':''} ${i>=5?'we':''} ${k===todayK?'today':''}"><div class="dn" onclick="openEvent(null,'${k}')">${dt.getDate()}</div>`+
+    html+=`<div class="dc ${out?'out':''} ${i===6?'sun':i===5?'sat':''} ${k===todayK?'today':''}"><div class="dn" onclick="openEvent(null,'${k}')">${dt.getDate()}</div>`+
       evs.map(e=>`<span class="ev evt" onclick="openEvent(${e.id})" title="${esc(e.title)}${e.note?' · '+esc(e.note):''} · ${(e.member_ids||[]).map(memName).join(', ')}">◆ ${e.time?e.time.slice(0,5)+' ':''}${esc(e.title)}</span>`).join('')+
       ends.map(t=>`<span class="ev st-${t.status}" onclick="openTask(${t.id})" title="${esc(t.title)} · ${esc(owners(t))}">● ${esc(t.title)}</span>`).join('')+
       starts.map(t=>`<span class="ev start" onclick="openTask(${t.id})" title="${esc(t.title)}">▷ ${esc(t.title)}</span>`).join('')+
