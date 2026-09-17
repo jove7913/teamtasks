@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#2F5D8A">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Seguimiento de tareas · 팀 업무 진척</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -159,7 +165,9 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
     <div class="field"><label>PIN</label><input id="loginPin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div>
     <div style="margin-top:16px;display:flex;gap:8px;align-items:center">
       <button class="btn p" id="loginBtn" style="flex:1" data-i="login">Entrar</button>
-          </div>
+    </div>
+    <button class="btn hide" id="installBtn2" style="width:100%;margin-top:10px" onclick="installApp()">📥 <span data-i="install">Instalar en este equipo</span></button>
+    <div id="iosHint" class="small muted hide" style="margin-top:10px"></div>
     <div id="loginMsg" class="small" style="margin-top:10px;color:var(--s-late)"></div>
   </div>
 </div>
@@ -168,6 +176,7 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
 <header class="top">
   <h1 data-i="app_title">Seguimiento de tareas</h1>
   <span class="who" id="who"></span>
+  <button class="b hide" id="installBtn" onclick="installApp()">📥 <span data-i="install">Instalar</span></button>
   <button class="b" onclick="logout()" data-i="logout">Salir</button>
 </header>
 <nav class="tabs">
@@ -208,6 +217,7 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
       <div class="card"><h3 data-i="by_status">Por estado</h3><canvas id="cStatus" height="220"></canvas></div>
     </div>
     <div class="card" style="margin-top:12px"><h3 data-i="late_list">Retrasadas y por vencer</h3><div class="tw" id="lateList"></div></div>
+    <div class="card" style="margin-top:12px"><h3 data-i="routine_panel">Rutinas de esta semana</h3><div class="tw" id="routinePanel"></div></div>
   </section>
 
   <!-- FEEDBACK QUEUE -->
@@ -375,7 +385,8 @@ const I18N = {
   kpi_total:'Total',kpi_curso:'En curso',kpi_done:'Completadas',kpi_late:'Retrasadas',kpi_hold:'En espera',kpi_fb:'Feedback pendiente',kpi_rate:'Avance medio',
   no_hist:'Sin registros anteriores.',confirm_del:'¿Eliminar esta tarea y todo su historial?',login_err:'PIN incorrecto',limit_err:'Máximo 10 miembros activos.',
   all_done:'Todo con feedback. ¡Bien!',nothing:'Nada pendiente.',req:'Completa los campos obligatorios.',tasks_n:'tareas',by:'por',
-  alert_title:'Tareas retrasadas',alert_routine:'rutinas sin marcar',alert_notify:'Activar avisos del navegador',alert_notify_on:'Avisos activados',notif_title:'Tarea retrasada',
+  install:'Instalar en este equipo',installed:'Aplicación instalada',ios_hint:'iPhone: Compartir (□↑) → Agregar a inicio',alert_title:'Tareas retrasadas',alert_routine:'rutinas sin marcar',alert_notify:'Activar avisos del navegador',alert_notify_on:'Avisos activados',notif_title:'Tarea retrasada',
+  routine_panel:'Rutinas de esta semana',kpi_routines:'Rutinas',cumplido:'Cumplido',
   recur:'Frecuencia',routines:'Rutinas (diarias / semanales)',end_until:'Hasta (opcional)',kpi_routine:'Rutinas cumplidas',routine_note:'Nota de la semana (opcional)',
   rc:{none:'Una vez',daily5:'Diaria (lun–vie)',daily6:'Diaria (lun–sáb)',weekly:'Semanal',monthly:'Mensual'},dow:['lun','mar','mié','jue','vie','sáb','dom']},
  ko:{app_title:'팀 업무 진척 현황',login_sub:'이름을 선택하고 PIN을 입력하세요',login:'로그인',logout:'나가기',member:'담당자',
@@ -395,7 +406,8 @@ const I18N = {
   kpi_total:'전체',kpi_curso:'진행중',kpi_done:'완료',kpi_late:'지연',kpi_hold:'보류',kpi_fb:'피드백 대기',kpi_rate:'평균 진행률',
   no_hist:'이전 기록이 없습니다.',confirm_del:'이 업무와 모든 이력을 삭제할까요?',login_err:'PIN이 틀렸습니다',limit_err:'활성 멤버는 최대 10명입니다.',
   all_done:'모두 피드백 완료. 👍',nothing:'대기 항목 없음.',req:'필수 항목을 입력하세요.',tasks_n:'건',by:'작성',
-  alert_title:'지연 업무',alert_routine:'미체크 반복 업무',alert_notify:'브라우저 알림 켜기',alert_notify_on:'알림 켜짐',notif_title:'업무 지연',
+  install:'이 기기에 설치',installed:'앱 설치됨',ios_hint:'아이폰: 공유(□↑) → 홈 화면에 추가',alert_title:'지연 업무',alert_routine:'미체크 반복 업무',alert_notify:'브라우저 알림 켜기',alert_notify_on:'알림 켜짐',notif_title:'업무 지연',
+  routine_panel:'이번 주 반복 업무',kpi_routines:'반복 업무',cumplido:'이행',
   recur:'주기',routines:'반복 업무 (매일 / 매주)',end_until:'종료일 (선택)',kpi_routine:'반복 업무 이행률',routine_note:'이번 주 메모 (선택)',
   rc:{none:'1회',daily5:'매일 (월~금)',daily6:'매일 (월~토)',weekly:'매주',monthly:'매월'},dow:['월','화','수','목','금','토','일']}
 };
@@ -490,7 +502,7 @@ function pushNewDelays(tasks){ // 브라우저 알림: 지난 방문 이후 새�
   localStorage.setItem('tt_seen_'+ME.id,JSON.stringify(tasks.map(t=>t.id)));
 }
 async function loadMembers(){ const {data}=await db.from('members').select('*').order('sort_order').order('name'); MEMBERS=data||[]; }
-async function loadTasks(){ const {data,error}=await db.from('tasks').select('*').order('end_date',{ascending:true}); if(error) toast(error.message); TASKS=data||[]; }
+async function loadTasks(){ const {data,error}=await db.from('tasks').select('*').order('end_date',{ascending:true,nullsFirst:false}); if(error){ console.error(error); alert('Error al cargar tareas / 업무 불러오기 실패:\n'+error.message); } TASKS=data||[]; }
 async function loadUpdates(){ const {data}=await db.from('weekly_updates').select('*').eq('week_key',weekKey(WEEK)); UPD=data||[]; await ensureInstances(); }
 /* ---- 반복 업무: 보고 있는 주차의 인스턴스를 자동 생성 ---- */
 function expectedDates(t,mon){ const out=[]; const s=t.start_date||'0000', e=t.end_date||'9999';
@@ -504,7 +516,7 @@ async function ensureInstances(){
   const mon=new Date(WEEK), sun=new Date(WEEK); sun.setDate(sun.getDate()+6);
   const {data}=await db.from('task_instances').select('*').in('template_id',tpl.map(t=>t.id)).gte('due_date',ymd(mon)).lte('due_date',ymd(sun)); INST=data||[];
   const missing=[]; tpl.forEach(t=>expectedDates(t,mon).forEach(k=>{ if(!INST.some(i=>i.template_id===t.id&&i.due_date===k)) missing.push({template_id:t.id,due_date:k,done:false}); }));
-  if(missing.length){ const {data:ins,error}=await db.from('task_instances').upsert(missing,{onConflict:'template_id,due_date',ignoreDuplicates:true}).select(); if(error) toast(error.message); else INST=INST.concat(ins||[]); }
+  if(missing.length){ const {data:ins,error}=await db.from('task_instances').upsert(missing,{onConflict:'template_id,due_date',ignoreDuplicates:true}).select(); if(error){ console.error(error); alert('Rutinas / 반복 업무 오류:\n'+error.message); } else INST=INST.concat(ins||[]); }
 }
 async function toggleInst(id,el){ const {error}=await db.from('task_instances').update({done:el.checked,done_at:el.checked?new Date().toISOString():null,done_by:el.checked?ME.id:null}).eq('id',id);
   if(error){ el.checked=!el.checked; return toast(error.message); } const i=INST.find(x=>x.id===id); if(i) i.done=el.checked; renderRoutineRates(); }
@@ -658,7 +670,7 @@ async function saveTask(){
   if(rec){ if(row.status==='planificado'||row.status==='retrasado'||row.status==='completado') row.status='en_curso'; }
   else { if(row.status!=='completado'&&row.status!=='en_espera'&&row.end_date<new Date().toISOString().slice(0,10)&&row.progress<100) row.status='retrasado'; if(row.progress===100) row.status='completado'; }
   const q=id?db.from('tasks').update(row).eq('id',id):db.from('tasks').insert({...row,created_by:ME.id});
-  const {error}=await q; if(error) return toast(error.message);
+  const {error}=await q; if(error){ console.error(error); alert('Error al guardar / 저장 실패:\n'+error.message+(error.hint?'\n'+error.hint:'')); return; }
   closeM('mTask'); toast(OT('saved')); await loadTasks(); await ensureInstances(); fillStatic(); renderAll();
 }
 async function deleteTask(){ const id=document.getElementById('tId').value; if(!id||!confirm(OT('confirm_del'))) return;
@@ -670,13 +682,18 @@ function renderPanel(){
   const pending=canFeedback()?fbQueue().length:0;
   const avg=ts.length?Math.round(ts.reduce((a,t)=>a+t.progress,0)/ts.length):0;
   const k=[['kpi_total',ts.length,'var(--primary)'],['kpi_curso',cnt('en_curso'),'var(--s-curso)'],['kpi_done',cnt('completado'),'var(--s-done)'],['kpi_late',cnt('retrasado'),'var(--s-late)'],['kpi_hold',cnt('en_espera'),'var(--s-hold)'],['kpi_rate',avg+'%','#1E8E9A']];
-  const rIds=new Set(visibleRoutines().map(t=>t.id)); const rIn=INST.filter(i=>rIds.has(i.template_id)&&i.due_date<=ymd(new Date())); if(rIn.length) k.push(['kpi_routine',Math.round(rIn.filter(i=>i.done).length/rIn.length*100)+'%','var(--s-hold)']);
+  const rts=visibleRoutines(); const rIds=new Set(rts.map(t=>t.id)); const rIn=INST.filter(i=>rIds.has(i.template_id)&&i.due_date<=ymd(new Date()));
+  if(rts.length) k.push(['kpi_routines',rts.length,'var(--s-hold)']); if(rIn.length) k.push(['kpi_routine',Math.round(rIn.filter(i=>i.done).length/rIn.length*100)+'%','var(--s-hold)']);
   if(canFeedback()) k.push(['kpi_fb',pending,'var(--amber)']);
   document.getElementById('kpis').innerHTML=k.map(([l,v,c])=>`<div class="kpi" style="border-left-color:${c}"><div class="l">${BL(l)}</div><div class="v">${v}</div></div>`).join('');
   drawMemberChart(ts); drawStatusChart(ts);
   const late=ts.filter(t=>t.status!=='completado'&&t.end_date).map(t=>({t,n:Math.round((new Date(t.end_date+'T00:00:00')-new Date().setHours(0,0,0,0))/86400000)})).filter(x=>x.n<=7).sort((a,b)=>a.n-b.n);
   document.getElementById('lateList').innerHTML=late.length?`<table class="t"><tr><th>${BL('col_task')}</th><th>${BL('member')}</th><th>${BL('status')}</th><th>%</th><th>${BL('end')}</th><th></th></tr>`+
     late.map(({t,n})=>`<tr><td>${esc(t.title)}</td><td>${esc(memName(t.member_id))}</td><td><span class="badge st-${t.status}">${BS('st',t.status)}</span></td><td>${t.progress}</td><td>${t.end_date}</td><td>${dday(t.end_date)}</td></tr>`).join('')+'</table>':`<p class="muted small">${BL('nothing')}</p>`;
+  const today=ymd(new Date());
+  document.getElementById('routinePanel').innerHTML=rts.length?`<table class="t"><tr><th>${BL('col_task')}</th><th>${BL('member')}</th><th>${BL('recur')}</th><th>${BL('cumplido')}</th><th>%</th></tr>`+
+    rts.map(t=>{const a=INST.filter(i=>i.template_id===t.id&&i.due_date<=today); const n=a.filter(i=>i.done).length; const pct=a.length?Math.round(n/a.length*100):null;
+      return `<tr><td>${esc(t.title)}</td><td>${esc(memName(t.member_id))}</td><td>${BS('rc',t.recur)}</td><td>${n}/${a.length}</td><td>${pct===null?'—':`<span class="badge" style="background:${pct>=80?'var(--s-done)':pct>=50?'var(--amber)':'var(--s-late)'}">${pct}%</span>`}</td></tr>`;}).join('')+'</table>':`<p class="muted small">${BL('nothing')}</p>`;
 }
 function drawMemberChart(ts){
   const c=document.getElementById('cMember'); const ctx=c.getContext('2d'); const W=c.width=c.parentElement.clientWidth-28, H=c.height=Math.max(160,MEMBERS.length*26);
@@ -698,11 +715,15 @@ function drawStatusChart(ts){
 }
 
 /* ===================== FEEDBACK QUEUE ===================== */
-function fbQueue(){ const vis=new Set(visibleAll().map(t=>t.id)); return UPD.filter(u=>vis.has(u.task_id)&&(u.done_text||u.plan_text)&&!u.feedback_type); }
+function fbQueue(){ // 피드백 대기 업무 목록 (task 배열)
+  const out=[]; visibleAll().forEach(t=>{ const u=UPD.find(x=>x.task_id===t.id)||{}; if(u.feedback_type) return;
+    const isR=t.recur&&t.recur!=='none';
+    if(isR){ if(INST.some(i=>i.template_id===t.id)) out.push(t); } else if(u.done_text||u.plan_text) out.push(t); });
+  return out; }
 function updateFbCount(){ const el=document.getElementById('fbCount'); if(!canFeedback()){el.classList.add('hide');return;} const n=fbQueue().length; el.textContent=n; el.classList.toggle('hide',!n); }
 function renderFb(){
   const q=fbQueue(); const box=document.getElementById('fbList');
-  box.innerHTML=q.length?q.map(u=>{const t=TASKS.find(x=>x.id===u.task_id); return t.recur&&t.recur!=='none'?routineCard(t):taskCard(t);}).join(''):`<div class="card empty">${BL('all_done')}</div>`;
+  box.innerHTML=q.length?q.map(t=>t.recur&&t.recur!=='none'?routineCard(t):taskCard(t)).join(''):`<div class="card empty">${BL('all_done')}</div>`;
   const upd=new Set(UPD.filter(u=>u.done_text||u.plan_text).map(u=>u.task_id));
   const none=visibleTasks().filter(t=>t.status!=='completado'&&t.status!=='en_espera'&&!upd.has(t.id));
   const byM={}; none.forEach(t=>{(byM[memName(t.member_id)]=byM[memName(t.member_id)]||[]).push(t.title);});
@@ -711,15 +732,17 @@ function renderFb(){
 
 /* ===================== GANTT ===================== */
 function renderGantt(){
-  const ts=visibleTasks().filter(t=>t.start_date&&t.end_date).sort((a,b)=>a.start_date<b.start_date?-1:1);
   const start=weekMonday(new Date()); start.setDate(start.getDate()-21); const weeks=10; const end=new Date(start); end.setDate(start.getDate()+weeks*7);
+  const endK=ymd(end);
+  const ts=visibleTasks().filter(t=>t.start_date&&t.end_date).sort((a,b)=>a.start_date<b.start_date?-1:1)
+    .concat(visibleRoutines().filter(t=>t.start_date).map(t=>({...t,_r:true,end_date:t.end_date||endK})));
   const span=end-start; const pct=d=>Math.max(0,Math.min(100,(new Date(d+'T00:00:00')-start)/span*100));
   const curKey=weekKey(new Date());
   let head='<div class="wkhead">'; for(let i=0;i<weeks;i++){const d=new Date(start); d.setDate(start.getDate()+i*7); head+=`<span class="${weekKey(d)===curKey?'cur':''}">${fmtD(d)}</span>`;} head+='</div>';
   const todayPct=(new Date().setHours(0,0,0,0)-start)/span*100;
   document.getElementById('ganttBox').innerHTML=ts.length?`<div class="gantt"><div class="lbl" style="font-weight:600">${BL('col_task')}</div>${head}`+
-    ts.map(t=>{const l=pct(t.start_date), r=pct(t.end_date); const w=Math.max(1,r-l);
-      return `<div class="lbl" title="${esc(t.title)}"><span class="badge st-${t.status}" style="font-size:10px;padding:0 5px">${ES('st')[t.status]}</span> ${esc(t.title)} <span class="muted">· ${esc(memName(t.member_id))}</span></div>
+    ts.map(t=>{const l=pct(t.start_date), r=pct(t.end_date); const w=Math.max(1,r-l); if(t._r){ const a=INST.filter(i=>i.template_id===t.id&&i.due_date<=ymd(new Date())); t.progress=a.length?Math.round(a.filter(i=>i.done).length/a.length*100):0; }
+      return `<div class="lbl" title="${esc(t.title)}"><span class="badge ${t._r?'':'st-'+t.status}" style="font-size:10px;padding:0 5px;${t._r?'background:var(--s-hold)':''}">${t._r?ES('rc')[t.recur]:ES('st')[t.status]}</span> ${esc(t.title)} <span class="muted">· ${esc(memName(t.member_id))}</span></div>
       <div class="row"><div class="gbar ${t.status}" style="left:${l}%;width:${w}%" title="${t.start_date}~${t.end_date} ${t.progress}%"><i style="width:${t.progress}%"></i></div><div class="today" style="left:${todayPct}%"></div></div>`;}).join('')+'</div>':`<div class="empty">${BL('no_tasks')}</div>`;
 }
 
@@ -754,6 +777,15 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 window.addEventListener('resize',()=>{if(VIEW==='panel') renderPanel();});
 
 applyLabels(); initLogin();
+
+/* ===================== PWA 설치 / 오프라인 ===================== */
+let deferredInstall=null;
+const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredInstall=e; if(!isStandalone()) ['installBtn','installBtn2'].forEach(id=>document.getElementById(id).classList.remove('hide')); });
+async function installApp(){ if(!deferredInstall) return; deferredInstall.prompt(); const {outcome}=await deferredInstall.userChoice; if(outcome==='accepted'){ toast(OT('installed')); ['installBtn','installBtn2'].forEach(id=>document.getElementById(id).classList.add('hide')); } deferredInstall=null; }
+window.addEventListener('appinstalled',()=>{ toast(OT('installed')); ['installBtn','installBtn2'].forEach(id=>document.getElementById(id).classList.add('hide')); });
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!isStandalone()){ const el=document.getElementById('iosHint'); el.textContent=OT('ios_hint'); el.classList.remove('hide'); }
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
 </script>
 </body>
 </html>
