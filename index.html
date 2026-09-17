@@ -184,6 +184,7 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
   <button data-v="panel" onclick="go('panel')"><span data-i="tab_panel">Panel</span></button>
   <button data-v="feedback" onclick="go('feedback')" id="tabFb"><span data-i="tab_fb">Feedback</span><span class="n hide" id="fbCount">0</span></button>
   <button data-v="gantt" onclick="go('gantt')"><span data-i="tab_gantt">Cronograma</span></button>
+  <button data-v="eval" onclick="go('eval')" id="tabEval"><span data-i="tab_eval">Evaluación</span></button>
   <button data-v="admin" onclick="go('admin')" id="tabAdmin"><span data-i="tab_admin">Equipo</span></button>
 </nav>
 
@@ -230,6 +231,18 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
   <!-- GANTT -->
   <section class="view" id="v-gantt">
     <div class="card"><div id="ganttBox"></div></div>
+  </section>
+
+  <!-- EVALUACION MENSUAL -->
+  <section class="view" id="v-eval">
+    <div class="toolbar">
+      <span class="week"><button class="btn sm" onclick="shiftMonth(-1)">‹</button><b id="monthLabel"></b><button class="btn sm" onclick="shiftMonth(1)">›</button><button class="btn sm" onclick="shiftMonth(0)" data-i="this_month">Este mes</button></span>
+      <span style="flex:1"></span>
+      <button class="btn" onclick="exportEval()">⬇ CSV</button>
+    </div>
+    <div class="card"><div class="tw" id="evalTable"></div></div>
+    <div class="card" style="margin-top:12px"><h3 data-i="eval_detail">Detalle por persona</h3><div id="evalDetail"></div></div>
+    <p class="muted small" id="evalNote" style="margin-top:10px"></p>
   </section>
 
   <!-- ADMIN -->
@@ -302,7 +315,7 @@ const DEMO = SUPABASE_URL.includes('YOUR-PROJECT');   // 키를 넣기 전에는
 
 /* ---------- 데모 모드: Supabase 없이 브라우저(localStorage)에서 동작 ---------- */
 function makeDemoDb(){
-  const KEY='tt_demo_v3';
+  const KEY='tt_demo_v4';
   const today=new Date(); const d=(n)=>{const x=new Date(today); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10);};
   const seed=()=>{
     const wk=weekKey(weekMonday(new Date()));
@@ -319,7 +332,7 @@ function makeDemoDb(){
         {id:2,title:'Separación física LH/RH en línea 7',team_name:'Moldeo',member_id:3,plant:'2',status:'en_curso',priority:'urgente',start_date:d(-30),end_date:d(-3),progress:70,kpi_target:'0 mezclas',kpi_actual:'2',description:''},
         {id:3,title:'Reducción de rechazo línea 4 (directo ≥ 92%)',team_name:'Pintura',member_id:4,plant:'2',status:'en_curso',priority:'alta',start_date:d(-14),end_date:d(20),progress:35,kpi_target:'92%',kpi_actual:'88.5%',description:''},
         {id:4,title:'Estandarizar limpieza de jigs (proveedor externo)',team_name:'Pintura',member_id:5,plant:'2',status:'planificado',priority:'media',start_date:d(2),end_date:d(30),progress:0,kpi_target:'',kpi_actual:'',description:''},
-        {id:5,title:'Capacitación cambio de molde < 20 min',team_name:'Moldeo',member_id:3,plant:'1',status:'completado',priority:'media',start_date:d(-40),end_date:d(-5),progress:100,kpi_target:'20 min',kpi_actual:'18 min',description:''},
+        {id:5,title:'Capacitación cambio de molde < 20 min',team_name:'Moldeo',member_id:3,plant:'1',status:'completado',priority:'media',start_date:d(-40),end_date:d(-5),progress:100,completed_at:new Date(Date.now()-3*86400000).toISOString(),kpi_target:'20 min',kpi_actual:'18 min',description:''},
         {id:6,title:'Revisión 5S y arranque de línea',team_name:'Moldeo',member_id:3,plant:'2',status:'en_curso',priority:'media',start_date:d(-60),end_date:null,progress:0,kpi_target:'',kpi_actual:'',description:'',recur:'daily6'},
         {id:7,title:'Reporte semanal de rechazo por línea',team_name:'Pintura',member_id:5,plant:'2',status:'en_curso',priority:'alta',start_date:d(-60),end_date:null,progress:0,kpi_target:'',kpi_actual:'',description:'',recur:'weekly'},
       ],
@@ -386,6 +399,7 @@ const I18N = {
   no_hist:'Sin registros anteriores.',confirm_del:'¿Eliminar esta tarea y todo su historial?',login_err:'PIN incorrecto',limit_err:'Máximo 10 miembros activos.',
   all_done:'Todo con feedback. ¡Bien!',nothing:'Nada pendiente.',req:'Completa los campos obligatorios.',tasks_n:'tareas',by:'por',
   install:'Instalar en este equipo',installed:'Aplicación instalada',ios_hint:'iPhone: Compartir (□↑) → Agregar a inicio',alert_title:'Tareas retrasadas',alert_routine:'rutinas sin marcar',alert_notify:'Activar avisos del navegador',alert_notify_on:'Avisos activados',notif_title:'Tarea retrasada',
+  tab_eval:'Evaluación',this_month:'Este mes',eval_detail:'Detalle por persona',ev_due:'Tareas con fecha límite',ev_done:'Completadas',ev_ontime:'A tiempo',ev_ontime_rate:'% a tiempo',ev_late_open:'Retrasadas (abiertas)',ev_avg_delay:'Retraso promedio (días)',ev_max_delay:'Retraso máx. (días)',ev_routine:'Rutinas %',ev_fb:'Feedback 👍/🔁/🆘/⏰',ev_score:'Puntaje',ev_note:'Puntaje = % a tiempo × 50 + rutinas % × 30 + (1 − retraso promedio/10) × 20. Retraso = días entre la fecha límite y la fecha real de cierre (o hoy si sigue abierta). Solo tareas con fecha límite dentro del mes ya vencida o completada.',ev_task:'Tarea',ev_due_date:'Límite',ev_closed:'Cierre',ev_delay:'Retraso',
   routine_panel:'Rutinas de esta semana',kpi_routines:'Rutinas',cumplido:'Cumplido',
   recur:'Frecuencia',routines:'Rutinas (diarias / semanales)',end_until:'Hasta (opcional)',kpi_routine:'Rutinas cumplidas',routine_note:'Nota de la semana (opcional)',
   rc:{none:'Una vez',daily5:'Diaria (lun–vie)',daily6:'Diaria (lun–sáb)',weekly:'Semanal',monthly:'Mensual'},dow:['lun','mar','mié','jue','vie','sáb','dom']},
@@ -407,6 +421,7 @@ const I18N = {
   no_hist:'이전 기록이 없습니다.',confirm_del:'이 업무와 모든 이력을 삭제할까요?',login_err:'PIN이 틀렸습니다',limit_err:'활성 멤버는 최대 10명입니다.',
   all_done:'모두 피드백 완료. 👍',nothing:'대기 항목 없음.',req:'필수 항목을 입력하세요.',tasks_n:'건',by:'작성',
   install:'이 기기에 설치',installed:'앱 설치됨',ios_hint:'아이폰: 공유(□↑) → 홈 화면에 추가',alert_title:'지연 업무',alert_routine:'미체크 반복 업무',alert_notify:'브라우저 알림 켜기',alert_notify_on:'알림 켜짐',notif_title:'업무 지연',
+  tab_eval:'월간 평가',this_month:'이번 달',eval_detail:'담당자별 상세',ev_due:'마감 도래 업무',ev_done:'완료',ev_ontime:'기한 내 완료',ev_ontime_rate:'정시 완료율',ev_late_open:'지연 중',ev_avg_delay:'평균 지연일',ev_max_delay:'최대 지연일',ev_routine:'반복 이행률',ev_fb:'피드백 👍/🔁/🆘/⏰',ev_score:'점수',ev_note:'점수 = 정시완료율×50 + 반복이행률×30 + (1−평균지연일/10)×20. 지연일 = 마감일과 실제 완료일(미완료면 오늘)의 차이. 해당 월 마감 업무 중 마감이 지났거나 완료된 것만 집계.',ev_task:'업무',ev_due_date:'마감',ev_closed:'완료일',ev_delay:'지연',
   routine_panel:'이번 주 반복 업무',kpi_routines:'반복 업무',cumplido:'이행',
   recur:'주기',routines:'반복 업무 (매일 / 매주)',end_until:'종료일 (선택)',kpi_routine:'반복 업무 이행률',routine_note:'이번 주 메모 (선택)',
   rc:{none:'1회',daily5:'매일 (월~금)',daily6:'매일 (월~토)',weekly:'매주',monthly:'매월'},dow:['월','화','수','목','금','토','일']}
@@ -422,7 +437,8 @@ const OS=(g,v)=>`${ES(g)[v]} / ${KO(g)[v]}`;
 function applyLabels(){ document.querySelectorAll('[data-i]').forEach(el=>{ if(typeof ES(el.dataset.i)==='string') el.innerHTML=BL(el.dataset.i); }); }
 
 /* ===================== state ===================== */
-let ME=null, MEMBERS=[], TASKS=[], UPD=[], INST=[], WEEK=null, VIEW='semana';
+let ME=null, MEMBERS=[], TASKS=[], UPD=[], INST=[], WEEK=null, VIEW='semana', MONTH=null;
+const EVAL_W={ontime:50,routine:30,delay:20,delayCap:10}; // 평가 가중치
 const RECURS=['none','daily5','daily6','weekly','monthly'];
 const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const STATUSES=['planificado','en_curso','completado','retrasado','en_espera'];
@@ -465,7 +481,8 @@ async function boot(){
   WEEK=weekMonday(new Date());
   document.getElementById('who').textContent=`${ME.name} · ${ME.role}`;
   document.getElementById('tabAdmin').classList.toggle('hide',!isMgr()); document.getElementById('demoReset').classList.toggle('hide',!DEMO);
-  document.getElementById('tabFb').classList.toggle('hide',!canFeedback());
+  document.getElementById('tabFb').classList.toggle('hide',!canFeedback()); document.getElementById('tabEval').classList.toggle('hide',!canFeedback());
+  MONTH=new Date(new Date().getFullYear(),new Date().getMonth(),1);
   await Promise.all([loadMembers(),loadTasks()]); await autoFlagDelays(); await loadUpdates(); fillStatic(); renderAll(); showAlerts();
 }
 /* ===================== 지연 자동 감지 · 알림 ===================== */
@@ -547,7 +564,7 @@ function fillStatic(){
 function go(v){ VIEW=v; document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
   document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); renderAll(); }
 function renderAll(){ document.getElementById('weekLabel').textContent=weekLabel(WEEK); if(typeof showAlerts==='function'&&ME&&!document.getElementById('alertBox').classList.contains('hide')) showAlerts();
-  if(VIEW==='semana') renderWeek(); if(VIEW==='panel') renderPanel(); if(VIEW==='feedback') renderFb(); if(VIEW==='gantt') renderGantt(); if(VIEW==='admin') renderAdmin(); updateFbCount(); }
+  if(VIEW==='semana') renderWeek(); if(VIEW==='panel') renderPanel(); if(VIEW==='feedback') renderFb(); if(VIEW==='gantt') renderGantt(); if(VIEW==='eval') renderEval(); if(VIEW==='admin') renderAdmin(); updateFbCount(); }
 
 /* ===================== WEEK VIEW ===================== */
 function filteredTasks(){
@@ -574,7 +591,7 @@ function fbCell(t,u){
   const has=!!u.feedback_type;
   if(canFeedback()){
     return `<div class="fb ${has?'':'pending'}">
-      <select id="fbt-${t.id}">${`<option value="">${OOT('fb_choose')}</option>`+FBS.map(f=>`<option value="${f}"${u.feedback_type===f?' selected':''}>${OS('fb',f)}</option>`).join('')}</select>
+      <select id="fbt-${t.id}">${`<option value="">${OT('fb_choose')}</option>`+FBS.map(f=>`<option value="${f}"${u.feedback_type===f?' selected':''}>${OS('fb',f)}</option>`).join('')}</select>
       <textarea id="fbx-${t.id}">${esc(u.feedback_text||'')}</textarea>
       <div class="acts"><button class="btn sm p" onclick="saveFb(${t.id})">${BL('fb_save')}</button>${has?`<span class="small muted">${memName(u.feedback_by)} · ${(u.feedback_at||'').slice(0,10)}${u.read_at?' · '+BL('fb_read'):''}</span>`:''}</div>
     </div>`;
@@ -667,8 +684,10 @@ async function saveTask(){
   if(!g('tTitle').trim()||!g('tMember')||!g('tStart')||(!rec&&!g('tEnd'))) return toast(OT('req'));
   const row={title:g('tTitle').trim(),member_id:+g('tMember'),status:g('tStatus'),priority:g('tPriority'),
     progress:rec?0:Math.max(0,Math.min(100,+g('tProgress')||0)),start_date:g('tStart'),end_date:g('tEnd')||null,recur:g('tRecur'),description:g('tDesc').trim()};
+  const prev=id?TASKS.find(x=>String(x.id)===String(id)):null;
   if(rec){ if(row.status==='planificado'||row.status==='retrasado'||row.status==='completado') row.status='en_curso'; }
   else { if(row.status!=='completado'&&row.status!=='en_espera'&&row.end_date<new Date().toISOString().slice(0,10)&&row.progress<100) row.status='retrasado'; if(row.progress===100) row.status='completado'; }
+  row.completed_at=row.status==='completado'?((prev&&prev.completed_at)||new Date().toISOString()):null;
   const q=id?db.from('tasks').update(row).eq('id',id):db.from('tasks').insert({...row,created_by:ME.id});
   const {error}=await q; if(error){ console.error(error); alert('Error al guardar / 저장 실패:\n'+error.message+(error.hint?'\n'+error.hint:'')); return; }
   closeM('mTask'); toast(OT('saved')); await loadTasks(); await ensureInstances(); fillStatic(); renderAll();
@@ -744,6 +763,44 @@ function renderGantt(){
     ts.map(t=>{const l=pct(t.start_date), r=pct(t.end_date); const w=Math.max(1,r-l); if(t._r){ const a=INST.filter(i=>i.template_id===t.id&&i.due_date<=ymd(new Date())); t.progress=a.length?Math.round(a.filter(i=>i.done).length/a.length*100):0; }
       return `<div class="lbl" title="${esc(t.title)}"><span class="badge ${t._r?'':'st-'+t.status}" style="font-size:10px;padding:0 5px;${t._r?'background:var(--s-hold)':''}">${t._r?ES('rc')[t.recur]:ES('st')[t.status]}</span> ${esc(t.title)} <span class="muted">· ${esc(memName(t.member_id))}</span></div>
       <div class="row"><div class="gbar ${t.status}" style="left:${l}%;width:${w}%" title="${t.start_date}~${t.end_date} ${t.progress}%"><i style="width:${t.progress}%"></i></div><div class="today" style="left:${todayPct}%"></div></div>`;}).join('')+'</div>':`<div class="empty">${BL('no_tasks')}</div>`;
+}
+
+/* ===================== EVALUACION MENSUAL ===================== */
+function shiftMonth(n){ if(n===0) MONTH=new Date(new Date().getFullYear(),new Date().getMonth(),1); else MONTH=new Date(MONTH.getFullYear(),MONTH.getMonth()+n,1); renderEval(); }
+function monthRange(){ const a=new Date(MONTH), b=new Date(MONTH.getFullYear(),MONTH.getMonth()+1,0); return [ymd(a),ymd(b)]; }
+function weekKeysIn(a,b){ const ks=new Set(); const d=new Date(a+'T00:00:00'); const e=new Date(b+'T00:00:00'); while(d<=e){ ks.add(weekKey(d)); d.setDate(d.getDate()+7);} ks.add(weekKey(e)); return [...ks]; }
+let EVAL=[];
+async function renderEval(){
+  const [a,b]=monthRange(); document.getElementById('monthLabel').textContent=`${MONTH.getFullYear()}-${String(MONTH.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('evalNote').textContent=OT('ev_note');
+  const [{data:insts},{data:upds}]=await Promise.all([
+    db.from('task_instances').select('*').gte('due_date',a).lte('due_date',b),
+    db.from('weekly_updates').select('*').in('week_key',weekKeysIn(a,b))]);
+  const today=ymd(new Date()); const todayMs=new Date(today+'T00:00:00').getTime();
+  const tplOwner=new Map(TASKS.map(t=>[t.id,t.member_id]));
+  EVAL=MEMBERS.filter(m=>m.active&&m.role!=='gerente').map(m=>{
+    const due=TASKS.filter(t=>(!t.recur||t.recur==='none')&&t.member_id===m.id&&t.end_date&&t.end_date>=a&&t.end_date<=b&&(t.end_date<=today||t.status==='completado')); // 아직 마감 안 된 미완료 업무는 제외
+    const rows=due.map(t=>{ const closed=t.completed_at?t.completed_at.slice(0,10):null; const endMs=new Date(t.end_date+'T00:00:00').getTime();
+      const refMs=closed?new Date(closed+'T00:00:00').getTime():(t.status==='completado'?endMs:todayMs);
+      const delay=Math.max(0,Math.round((refMs-endMs)/86400000)); return {t,closed,delay,ontime:t.status==='completado'&&delay===0}; });
+    const done=rows.filter(r=>r.t.status==='completado').length, ontime=rows.filter(r=>r.ontime).length, lateOpen=rows.filter(r=>r.t.status==='retrasado').length;
+    const delays=rows.map(r=>r.delay); const avgDelay=delays.length?+(delays.reduce((x,y)=>x+y,0)/delays.length).toFixed(1):0; const maxDelay=delays.length?Math.max(...delays):0;
+    const ri=(insts||[]).filter(i=>tplOwner.get(i.template_id)===m.id&&i.due_date<=today); const rRate=ri.length?Math.round(ri.filter(i=>i.done).length/ri.length*100):null;
+    const fb={bien:0,ajustar:0,apoyo:0,replanificar:0}; (upds||[]).forEach(u=>{ if(tplOwner.get(u.task_id)===m.id&&u.feedback_type) fb[u.feedback_type]++; });
+    const onRate=rows.length?Math.round(ontime/rows.length*100):null;
+    const score=(rows.length||ri.length)?Math.round((onRate===null?EVAL_W.ontime:onRate/100*EVAL_W.ontime)+(rRate===null?EVAL_W.routine:rRate/100*EVAL_W.routine)+(1-Math.min(avgDelay/EVAL_W.delayCap,1))*EVAL_W.delay):null;
+    return {m,rows,due:rows.length,done,ontime,onRate,lateOpen,avgDelay,maxDelay,rRate,fb,score};
+  });
+  const col=v=>v===null?'—':`<span class="badge" style="background:${v>=80?'var(--s-done)':v>=50?'var(--amber)':'var(--s-late)'}">${v}</span>`;
+  document.getElementById('evalTable').innerHTML=`<table class="t"><tr><th>${BL('member')}</th><th>${BL('ev_due')}</th><th>${BL('ev_done')}</th><th>${BL('ev_ontime')}</th><th>${BL('ev_ontime_rate')}</th><th>${BL('ev_late_open')}</th><th>${BL('ev_avg_delay')}</th><th>${BL('ev_max_delay')}</th><th>${BL('ev_routine')}</th><th>${BL('ev_fb')}</th><th>${BL('ev_score')}</th></tr>`+
+    EVAL.map(e=>`<tr><td><b>${esc(e.m.name)}</b></td><td>${e.due}</td><td>${e.done}</td><td>${e.ontime}</td><td>${e.onRate===null?'—':e.onRate+'%'}</td><td>${e.lateOpen?`<span class="badge st-retrasado">${e.lateOpen}</span>`:0}</td><td><b>${e.avgDelay}</b></td><td>${e.maxDelay}</td><td>${e.rRate===null?'—':e.rRate+'%'}</td><td>${e.fb.bien}/${e.fb.ajustar}/${e.fb.apoyo}/${e.fb.replanificar}</td><td>${col(e.score)}</td></tr>`).join('')+'</table>';
+  document.getElementById('evalDetail').innerHTML=EVAL.filter(e=>e.rows.length).map(e=>`<div class="hist"><b>${esc(e.m.name)}</b><table class="t" style="margin-top:4px"><tr><th>${BL('ev_task')}</th><th>${BL('status')}</th><th>${BL('ev_due_date')}</th><th>${BL('ev_closed')}</th><th>${BL('ev_delay')}</th></tr>`+
+    e.rows.sort((x,y)=>y.delay-x.delay).map(r=>`<tr><td>${esc(r.t.title)}</td><td><span class="badge st-${r.t.status}">${BS('st',r.t.status)}</span></td><td>${r.t.end_date}</td><td>${r.closed||'—'}</td><td>${r.delay?`<span class="badge st-retrasado">+${r.delay}d</span>`:'0'}</td></tr>`).join('')+'</table></div>').join('')||`<p class="muted small">${BL('nothing')}</p>`;
+}
+function exportEval(){
+  const head=['Persona','Tareas con límite','Completadas','A tiempo','% a tiempo','Retrasadas abiertas','Retraso promedio (d)','Retraso máx (d)','Rutinas %','FB bien','FB ajustar','FB apoyo','FB replanificar','Puntaje'];
+  const lines=[head.join(',')].concat(EVAL.map(e=>[e.m.name,e.due,e.done,e.ontime,e.onRate??'',e.lateOpen,e.avgDelay,e.maxDelay,e.rRate??'',e.fb.bien,e.fb.ajustar,e.fb.apoyo,e.fb.replanificar,e.score??''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')));
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`evaluacion_${document.getElementById('monthLabel').textContent}.csv`; a.click();
 }
 
 /* ===================== ADMIN ===================== */
