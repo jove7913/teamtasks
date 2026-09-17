@@ -87,8 +87,9 @@ main{padding:14px;max-width:1400px;margin:0 auto}
 .fb textarea{min-height:56px;background:#fff;border:1px solid var(--line)}
 .fb select{width:100%;padding:5px;border:1px solid var(--line);border-radius:6px;background:#fff;margin-bottom:6px}
 .wk-legend{display:none;grid-template-columns:minmax(220px,1.1fr) 1fr 1fr minmax(220px,.9fr);font-size:12px;color:var(--muted);padding:0 12px 6px}
-@media(min-width:900px){.wk-legend{display:grid}.wk .head{display:none}}
-@media(max-width:899px){.wk{grid-template-columns:1fr}.wk>div{border-left:none;border-top:1px solid var(--line)}.wk>div:first-child{border-top:none}}
+@media(min-width:1100px){.wk-legend{display:grid}.wk .head{display:none}}
+@media(min-width:700px) and (max-width:1099px){.wk{grid-template-columns:1fr 1fr}.wk>div:nth-child(3){border-left:none}.wk>div:nth-child(3),.wk>div:nth-child(4){border-top:1px solid var(--line)}}
+@media(max-width:699px){.wk{grid-template-columns:1fr}.wk>div{border-left:none;border-top:1px solid var(--line)}.wk>div:first-child{border-top:none}.wk textarea{min-height:70px}}
 
 /* ---- panel ---- */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
@@ -150,7 +151,69 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
 .rt textarea:hover{border-color:var(--line)}.rt textarea:focus{border-color:var(--primary)}.rt textarea.saved{border-color:var(--s-done)}
 .rt .rate{font-size:12px;font-weight:600}
 .sec{font-size:13px;font-weight:600;color:var(--muted);margin:16px 0 8px}
-@media(max-width:899px){.rt{grid-template-columns:1fr}.rt>div{border-left:none;border-top:1px solid var(--line)}.rt>div:first-child{border-top:none}}
+@media(min-width:700px) and (max-width:1099px){.rt{grid-template-columns:1fr 1fr}.rt>div:nth-child(3){grid-column:1/-1;border-left:none;border-top:1px solid var(--line)}}
+@media(max-width:699px){.rt{grid-template-columns:1fr}.rt>div{border-left:none;border-top:1px solid var(--line)}.rt>div:first-child{border-top:none}}
+/* 반복 업무 일자 칩 */
+.rt .day{min-width:46px}
+.rt .day button{width:40px;height:40px;border-radius:8px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font-size:15px;line-height:1}
+.rt .day button.done{background:var(--s-done);border-color:var(--s-done);color:#fff}
+.rt .day.miss button{border-color:var(--s-late);color:var(--s-late)}
+.rt .day.future button{opacity:.45}
+.rt .day .dt{font-size:10px;color:var(--muted)}
+.fb-req{display:inline-block;padding:2px 8px;border-radius:10px;background:var(--amber-soft);color:#7A4E05;font-size:11px;font-weight:600}
+/* 간트 반복 인스턴스 */
+.gantt .inst{position:absolute;top:9px;height:15px;border-radius:3px;background:#C9D6E3}
+.gantt .inst.done{background:var(--s-done)}.gantt .inst.miss{background:var(--s-late)}
+/* 전체 반응형 */
+@media(max-width:699px){
+  body{font-size:13px}
+  .top{padding:8px 10px;gap:8px}.top h1{font-size:14px}.top .who{display:none}
+  nav.tabs{top:40px}nav.tabs button{padding:10px 10px;font-size:12px}
+  main{padding:10px}
+  .toolbar{gap:6px}.toolbar select,.toolbar input{flex:1;min-width:120px}
+  .week b{min-width:0;font-size:12px}
+  .field input,.field select,.field textarea,.wk textarea,.rt textarea,.fb textarea,.fb select{font-size:16px} /* iOS 확대 방지 */
+  .grid{grid-template-columns:1fr 1fr}.grid .field[style*="grid-column"]{grid-column:1/-1}
+  .modal{padding:14px;border-radius:8px}.back{padding:10px 6px}
+  .kpis{grid-template-columns:repeat(3,1fr);gap:6px}.kpi{padding:8px 10px}.kpi .v{font-size:20px}
+  .charts{grid-template-columns:1fr}
+  .gantt{grid-template-columns:120px 1fr;min-width:520px}.gantt .lbl{padding:6px 4px;font-size:11px}
+  table.t th,table.t td{padding:6px 5px;font-size:12px;white-space:nowrap}
+  .btn{padding:8px 12px}.btn.sm{padding:5px 8px}
+}
+@media(min-width:700px) and (max-width:1099px){
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .charts{grid-template-columns:1fr 1fr}
+}
+#ganttBox{overflow-x:auto}
+/* 담당자 다중선택 */
+.chk-list{display:flex;flex-wrap:wrap;gap:6px;padding:6px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2)}
+.chk-list label{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--line);border-radius:16px;background:#fff;cursor:pointer;font-size:13px}
+.chk-list label:has(input:checked){background:var(--primary);color:#fff;border-color:var(--primary)}
+.chk-list input{margin:0}
+/* 일일 반복 업무 월간 그리드 */
+.dgrid{border-collapse:collapse;font-size:11px}
+.dgrid th,.dgrid td{border:1px solid var(--line);text-align:center;padding:0;min-width:24px;height:26px}
+.dgrid th{background:var(--panel-2);font-weight:600;color:var(--muted)}
+.dgrid th.we,.dgrid td.we{background:#F3F4F6}
+.dgrid th.today,.dgrid td.today{background:var(--amber-soft)}
+.dgrid td.name{text-align:left;padding:0 8px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:12px;background:var(--panel)}
+.dgrid td.ok{background:var(--s-done);color:#fff;font-weight:700}
+.dgrid td.miss{background:#F1C9C9;color:var(--s-late);font-weight:700}
+.dgrid td.na{color:#C5CBD1}
+.dgrid td.rate{font-weight:600;white-space:nowrap;padding:0 6px}
+/* 월간 달력 */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;min-width:700px}
+.cal .dh{background:var(--panel-2);padding:6px;text-align:center;font-size:12px;color:var(--muted);font-weight:600}
+.cal .dc{background:var(--panel);min-height:96px;padding:4px 5px;font-size:12px}
+.cal .dc.out{background:#F6F7F8;color:#B5BCC4}
+.cal .dc.we{background:#FAFBFB}
+.cal .dc.today{background:var(--amber-soft)}
+.cal .dn{font-weight:700;font-size:12px;margin-bottom:3px}
+.cal .ev{display:block;padding:1px 5px;border-radius:4px;margin-bottom:2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-size:11px}
+.cal .ev.start{background:#fff;border:1px dashed var(--line);color:var(--muted)}
+.cal .ev.rt{background:var(--s-hold)}
+#calBox{overflow-x:auto}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -183,6 +246,7 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
   <button data-v="semana" class="on" onclick="go('semana')"><span data-i="tab_week">Semana</span></button>
   <button data-v="panel" onclick="go('panel')"><span data-i="tab_panel">Panel</span></button>
   <button data-v="feedback" onclick="go('feedback')" id="tabFb"><span data-i="tab_fb">Feedback</span><span class="n hide" id="fbCount">0</span></button>
+  <button data-v="cal" onclick="go('cal')"><span data-i="tab_cal">Calendario</span></button>
   <button data-v="gantt" onclick="go('gantt')"><span data-i="tab_gantt">Cronograma</span></button>
   <button data-v="eval" onclick="go('eval')" id="tabEval"><span data-i="tab_eval">Evaluación</span></button>
   <button data-v="admin" onclick="go('admin')" id="tabAdmin"><span data-i="tab_admin">Equipo</span></button>
@@ -218,6 +282,7 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
       <div class="card"><h3 data-i="by_status">Por estado</h3><canvas id="cStatus" height="220"></canvas></div>
     </div>
     <div class="card" style="margin-top:12px"><h3 data-i="late_list">Retrasadas y por vencer</h3><div class="tw" id="lateList"></div></div>
+    <div class="card" style="margin-top:12px"><div class="toolbar" style="margin-bottom:6px"><h3 data-i="daily_grid">Rutinas diarias</h3><span class="week"><button class="btn sm" onclick="shiftPanelMonth(-1)">‹</button><b id="panelMonthLabel" style="min-width:70px"></b><button class="btn sm" onclick="shiftPanelMonth(1)">›</button></span></div><div class="tw" id="dailyGrid"></div></div>
     <div class="card" style="margin-top:12px"><h3 data-i="routine_panel">Rutinas de esta semana</h3><div class="tw" id="routinePanel"></div></div>
   </section>
 
@@ -226,6 +291,19 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
     <p class="muted small" data-i="fb_help">Actualizaciones de esta semana sin feedback. Escribe una línea por tarea.</p>
     <div id="fbList"></div>
     <div class="card" style="margin-top:14px"><h3 data-i="no_update">Sin actualización esta semana</h3><div id="noUpdList" class="small" style="margin-top:6px"></div></div>
+  </section>
+
+  <!-- CALENDARIO -->
+  <section class="view" id="v-cal">
+    <div class="toolbar">
+      <span class="week"><button class="btn sm" onclick="shiftCal(-1)">‹</button><b id="calLabel"></b><button class="btn sm" onclick="shiftCal(1)">›</button><button class="btn sm" onclick="shiftCal(0)" data-i="this_month">Este mes</button></span>
+      <select id="calMember" onchange="renderCal()"><option value="">—</option></select>
+      <label class="small"><input type="checkbox" id="calRoutines" onchange="renderCal()"> <span data-i="cal_show_rt">Mostrar rutinas</span></label>
+      <span style="flex:1"></span>
+      <button class="btn p" onclick="openTask()" data-i="new_task">+ Nueva tarea</button>
+    </div>
+    <div class="card" style="padding:8px"><div id="calBox"></div></div>
+    <p class="muted small" data-i="cal_help" style="margin-top:8px">● fecha límite (color = estado) · ▷ inicio · clic para editar</p>
   </section>
 
   <!-- GANTT -->
@@ -266,7 +344,7 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
   <input type="hidden" id="tId">
   <div class="grid">
     <div class="field" style="grid-column:1/-1"><label data-i="task">Tarea *</label><input id="tTitle"></div>
-    <div class="field"><label data-i="member">Responsable *</label><select id="tMember"></select></div>
+    <div class="field" style="grid-column:1/-1"><label data-i="members_multi">Responsables * (varios = colaboración)</label><div class="chk-list" id="tMembers"></div></div>
     <div class="field"><label data-i="status">Estado</label><select id="tStatus"></select></div>
     <div class="field"><label data-i="priority">Prioridad</label><select id="tPriority"></select></div>
     <div class="field"><label data-i="recur">Frecuencia</label><select id="tRecur" onchange="onRecurChange()"></select></div>
@@ -315,7 +393,7 @@ const DEMO = SUPABASE_URL.includes('YOUR-PROJECT');   // 키를 넣기 전에는
 
 /* ---------- 데모 모드: Supabase 없이 브라우저(localStorage)에서 동작 ---------- */
 function makeDemoDb(){
-  const KEY='tt_demo_v4';
+  const KEY='tt_demo_v6';
   const today=new Date(); const d=(n)=>{const x=new Date(today); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10);};
   const seed=()=>{
     const wk=weekKey(weekMonday(new Date()));
@@ -328,7 +406,7 @@ function makeDemoDb(){
         {id:5,name:'Jorge',team_name:'Pintura',role:'miembro',plant:'2',pin:'4444',active:true,sort_order:40},
       ],
       tasks:[
-        {id:1,title:'Automatización celda 3 – robot de descarga',team_name:'Moldeo',member_id:2,plant:'2',status:'en_curso',priority:'alta',start_date:d(-20),end_date:d(12),progress:55,kpi_target:'-2 personas/turno',kpi_actual:'-1',description:''},
+        {id:1,title:'Automatización celda 3 – robot de descarga',team_name:'Moldeo',member_id:2,member_ids:[2,3],plant:'2',status:'en_curso',priority:'alta',start_date:d(-20),end_date:d(12),progress:55,kpi_target:'-2 personas/turno',kpi_actual:'-1',description:''},
         {id:2,title:'Separación física LH/RH en línea 7',team_name:'Moldeo',member_id:3,plant:'2',status:'en_curso',priority:'urgente',start_date:d(-30),end_date:d(-3),progress:70,kpi_target:'0 mezclas',kpi_actual:'2',description:''},
         {id:3,title:'Reducción de rechazo línea 4 (directo ≥ 92%)',team_name:'Pintura',member_id:4,plant:'2',status:'en_curso',priority:'alta',start_date:d(-14),end_date:d(20),progress:35,kpi_target:'92%',kpi_actual:'88.5%',description:''},
         {id:4,title:'Estandarizar limpieza de jigs (proveedor externo)',team_name:'Pintura',member_id:5,plant:'2',status:'planificado',priority:'media',start_date:d(2),end_date:d(30),progress:0,kpi_target:'',kpi_actual:'',description:''},
@@ -366,7 +444,7 @@ function makeDemoDb(){
       else if(this.op==='insert'){ const r={...this.row,id:nextId(this.t),created_at:new Date().toISOString()}; if(this.t==='members'&&limitHit(r,null)) return {data:null,error:{message:'MEMBER_LIMIT'}}; rows.push(r); out=[r]; }
       else if(this.op==='update'){ match.forEach(r=>{ if(this.t==='members'&&limitHit({...r,...this.row},r.id)) throw {message:'MEMBER_LIMIT'}; Object.assign(r,this.row,{updated_at:new Date().toISOString()}); }); out=match; }
       else if(this.op==='delete'){ match.forEach(r=>rows.splice(rows.indexOf(r),1)); if(this.t==='tasks'){ S.weekly_updates=S.weekly_updates.filter(u=>!match.some(t=>t.id===u.task_id)); S.task_instances=(S.task_instances||[]).filter(u=>!match.some(t=>t.id===u.template_id)); } out=match; }
-      else if(this.op==='upsert'){ if(Array.isArray(this.row)){ const arr=this.row; const outs=[]; for(const rw of arr){ this.row=rw; const q=this.run1(rows); outs.push(q);} out=outs; } else { let r=rows.find(x=>this.conf.every(k=>String(x[k])===String(this.row[k]))); if(r){ if(this.ignoreDup) {} else Object.assign(r,this.row); } else { r={done:false,feedback_type:null,feedback_text:'',feedback_by:null,feedback_at:null,read_at:null,done_text:'',plan_text:'',...this.row,id:nextId(this.t)}; rows.push(r);} out=[r]; } }
+      else if(this.op==='upsert'){ if(Array.isArray(this.row)){ const arr=this.row; const outs=[]; for(const rw of arr){ this.row=rw; const q=this.run1(rows); outs.push(q);} out=outs; } else { let r=rows.find(x=>this.conf.every(k=>String(x[k])===String(this.row[k]))); if(r){ if(this.ignoreDup) {} else Object.assign(r,this.row); } else { r={done:false,fb_requested:false,feedback_type:null,feedback_text:'',feedback_by:null,feedback_at:null,read_at:null,done_text:'',plan_text:'',...this.row,id:nextId(this.t)}; rows.push(r);} out=[r]; } }
       save(); return {data:this.one?(out[0]||null):out,error:null};
     }
     run1(rows){ let r=rows.find(x=>this.conf.every(k=>String(x[k])===String(this.row[k]))); if(r){ if(!this.ignoreDup) Object.assign(r,this.row); } else { r={done:false,...this.row,id:nextId(this.t)}; rows.push(r);} return r; }
@@ -400,6 +478,8 @@ const I18N = {
   all_done:'Todo con feedback. ¡Bien!',nothing:'Nada pendiente.',req:'Completa los campos obligatorios.',tasks_n:'tareas',by:'por',
   install:'Instalar en este equipo',installed:'Aplicación instalada',ios_hint:'iPhone: Compartir (□↑) → Agregar a inicio',alert_title:'Tareas retrasadas',alert_routine:'rutinas sin marcar',alert_notify:'Activar avisos del navegador',alert_notify_on:'Avisos activados',notif_title:'Tarea retrasada',
   tab_eval:'Evaluación',this_month:'Este mes',eval_detail:'Detalle por persona',ev_due:'Tareas con fecha límite',ev_done:'Completadas',ev_ontime:'A tiempo',ev_ontime_rate:'% a tiempo',ev_late_open:'Retrasadas (abiertas)',ev_avg_delay:'Retraso promedio (días)',ev_max_delay:'Retraso máx. (días)',ev_routine:'Rutinas %',ev_fb:'Feedback 👍/🔁/🆘/⏰',ev_score:'Puntaje',ev_note:'Puntaje = % a tiempo × 50 + rutinas % × 30 + (1 − retraso promedio/10) × 20. Retraso = días entre la fecha límite y la fecha real de cierre (o hoy si sigue abierta). Solo tareas con fecha límite dentro del mes ya vencida o completada.',ev_task:'Tarea',ev_due_date:'Límite',ev_closed:'Cierre',ev_delay:'Retraso',
+  tab_cal:'Calendario',daily_grid:'Rutinas diarias',members_multi:'Responsables * (varios = colaboración)',cal_show_rt:'Mostrar rutinas',cal_help:'● fecha límite (color = estado) · ▷ inicio · clic para editar',
+  fb_request:'Solicitar feedback',fb_requested:'Feedback solicitado',fb_cancel_req:'Cancelar solicitud',done_on:'Hecho',
   routine_panel:'Rutinas de esta semana',kpi_routines:'Rutinas',cumplido:'Cumplido',
   recur:'Frecuencia',routines:'Rutinas (diarias / semanales)',end_until:'Hasta (opcional)',kpi_routine:'Rutinas cumplidas',routine_note:'Nota de la semana (opcional)',
   rc:{none:'Una vez',daily5:'Diaria (lun–vie)',daily6:'Diaria (lun–sáb)',weekly:'Semanal',monthly:'Mensual'},dow:['lun','mar','mié','jue','vie','sáb','dom']},
@@ -422,6 +502,8 @@ const I18N = {
   all_done:'모두 피드백 완료. 👍',nothing:'대기 항목 없음.',req:'필수 항목을 입력하세요.',tasks_n:'건',by:'작성',
   install:'이 기기에 설치',installed:'앱 설치됨',ios_hint:'아이폰: 공유(□↑) → 홈 화면에 추가',alert_title:'지연 업무',alert_routine:'미체크 반복 업무',alert_notify:'브라우저 알림 켜기',alert_notify_on:'알림 켜짐',notif_title:'업무 지연',
   tab_eval:'월간 평가',this_month:'이번 달',eval_detail:'담당자별 상세',ev_due:'마감 도래 업무',ev_done:'완료',ev_ontime:'기한 내 완료',ev_ontime_rate:'정시 완료율',ev_late_open:'지연 중',ev_avg_delay:'평균 지연일',ev_max_delay:'최대 지연일',ev_routine:'반복 이행률',ev_fb:'피드백 👍/🔁/🆘/⏰',ev_score:'점수',ev_note:'점수 = 정시완료율×50 + 반복이행률×30 + (1−평균지연일/10)×20. 지연일 = 마감일과 실제 완료일(미완료면 오늘)의 차이. 해당 월 마감 업무 중 마감이 지났거나 완료된 것만 집계.',ev_task:'업무',ev_due_date:'마감',ev_closed:'완료일',ev_delay:'지연',
+  tab_cal:'달력',daily_grid:'일일 반복 업무',members_multi:'담당자 * (여러 명 = 협업)',cal_show_rt:'반복 업무 표시',cal_help:'● 마감일 (색 = 상태) · ▷ 시작일 · 클릭하면 수정',
+  fb_request:'피드백 요청',fb_requested:'피드백 요청됨',fb_cancel_req:'요청 취소',done_on:'완료',
   routine_panel:'이번 주 반복 업무',kpi_routines:'반복 업무',cumplido:'이행',
   recur:'주기',routines:'반복 업무 (매일 / 매주)',end_until:'종료일 (선택)',kpi_routine:'반복 업무 이행률',routine_note:'이번 주 메모 (선택)',
   rc:{none:'1회',daily5:'매일 (월~금)',daily6:'매일 (월~토)',weekly:'매주',monthly:'매월'},dow:['월','화','수','목','금','토','일']}
@@ -437,7 +519,10 @@ const OS=(g,v)=>`${ES(g)[v]} / ${KO(g)[v]}`;
 function applyLabels(){ document.querySelectorAll('[data-i]').forEach(el=>{ if(typeof ES(el.dataset.i)==='string') el.innerHTML=BL(el.dataset.i); }); }
 
 /* ===================== state ===================== */
-let ME=null, MEMBERS=[], TASKS=[], UPD=[], INST=[], WEEK=null, VIEW='semana', MONTH=null;
+let ME=null, MEMBERS=[], TASKS=[], UPD=[], INST=[], WEEK=null, VIEW='semana', MONTH=null, CAL=null, PMONTH=null;
+const ownerIds=t=>(t.member_ids&&t.member_ids.length?t.member_ids:(t.member_id?[t.member_id]:[])).map(Number);
+const owners=t=>ownerIds(t).map(memName).join(', ')||'—';
+const isOwner=(t,id)=>ownerIds(t).includes(Number(id));
 const EVAL_W={ontime:50,routine:30,delay:20,delayCap:10}; // 평가 가중치
 const RECURS=['none','daily5','daily6','weekly','monthly'];
 const ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -482,8 +567,8 @@ async function boot(){
   document.getElementById('who').textContent=`${ME.name} · ${ME.role}`;
   document.getElementById('tabAdmin').classList.toggle('hide',!isMgr()); document.getElementById('demoReset').classList.toggle('hide',!DEMO);
   document.getElementById('tabFb').classList.toggle('hide',!canFeedback()); document.getElementById('tabEval').classList.toggle('hide',!canFeedback());
-  MONTH=new Date(new Date().getFullYear(),new Date().getMonth(),1);
-  await Promise.all([loadMembers(),loadTasks()]); await autoFlagDelays(); await loadUpdates(); fillStatic(); renderAll(); showAlerts();
+  MONTH=new Date(new Date().getFullYear(),new Date().getMonth(),1); CAL=new Date(MONTH); PMONTH=new Date(MONTH);
+  await Promise.all([loadMembers(),loadTasks()]); await autoFlagDelays(); await loadUpdates(); fillStatic(); go('semana'); showAlerts();
 }
 /* ===================== 지연 자동 감지 · 알림 ===================== */
 async function autoFlagDelays(){ // 마감 지난 미완료 업무 → 자동으로 '지연' 처리 (DB 반영)
@@ -501,7 +586,7 @@ function myDelays(){ // 매니저/팀장: 전체, 팀원: 본인
 function showAlerts(){
   const {tasks,missed}=myDelays(); const box=document.getElementById('alertBox');
   if(!tasks.length&&!missed.length){ box.classList.add('hide'); return; }
-  const byM={}; tasks.forEach(t=>{(byM[memName(t.member_id)]=byM[memName(t.member_id)]||[]).push(t);});
+  const byM={}; tasks.forEach(t=>{ownerIds(t).forEach(id=>{(byM[memName(id)]=byM[memName(id)]||[]).push(t);});});
   const perm=('Notification' in window)?Notification.permission:'unsupported';
   box.innerHTML=`<div class="body"><b>⚠️ ${BL('alert_title')}: ${tasks.length}</b>${missed.length?` · ${BL('alert_routine')}: ${missed.length}`:''}
     <ul>${Object.entries(byM).map(([m,ts])=>`<li><b>${esc(m)}</b> — ${ts.map(t=>`${esc(t.title)} ${dday(t.end_date)}`).join(', ')}</li>`).join('')}</ul></div>
@@ -515,31 +600,39 @@ function pushNewDelays(tasks){ // 브라우저 알림: 지난 방문 이후 새�
   if(!('Notification' in window)||Notification.permission!=='granted') return;
   const seen=new Set(JSON.parse(localStorage.getItem('tt_seen_'+ME.id)||'[]'));
   const fresh=tasks.filter(t=>!seen.has(t.id));
-  if(fresh.length){ try{ new Notification(`${ES('notif_title')} · ${KO('notif_title')} (${fresh.length})`,{body:fresh.slice(0,5).map(t=>`${memName(t.member_id)}: ${t.title}`).join('\n')}); }catch(e){} }
+  if(fresh.length){ try{ new Notification(`${ES('notif_title')} · ${KO('notif_title')} (${fresh.length})`,{body:fresh.slice(0,5).map(t=>`${owners(t)}: ${t.title}`).join('\n')}); }catch(e){} }
   localStorage.setItem('tt_seen_'+ME.id,JSON.stringify(tasks.map(t=>t.id)));
 }
 async function loadMembers(){ const {data}=await db.from('members').select('*').order('sort_order').order('name'); MEMBERS=data||[]; }
 async function loadTasks(){ const {data,error}=await db.from('tasks').select('*').order('end_date',{ascending:true,nullsFirst:false}); if(error){ console.error(error); alert('Error al cargar tareas / 업무 불러오기 실패:\n'+error.message); } TASKS=data||[]; }
 async function loadUpdates(){ const {data}=await db.from('weekly_updates').select('*').eq('week_key',weekKey(WEEK)); UPD=data||[]; await ensureInstances(); }
 /* ---- 반복 업무: 보고 있는 주차의 인스턴스를 자동 생성 ---- */
-function expectedDates(t,mon){ const out=[]; const s=t.start_date||'0000', e=t.end_date||'9999';
-  for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); const k=ymd(d); if(k<s||k>e) continue;
-    if(t.recur==='daily5'&&i<5) out.push(k); else if(t.recur==='daily6'&&i<6) out.push(k);
-    else if(t.recur==='weekly'){ const sd=t.start_date?(new Date(t.start_date+'T00:00:00').getDay()+6)%7:4; if(i===sd) out.push(k); }
-    else if(t.recur==='monthly'&&t.start_date&&d.getDate()===new Date(t.start_date+'T00:00:00').getDate()) out.push(k); }
+function expectedDates(t,from,to){ // from~to(Date) 범위에서 반복 업무의 예정일
+  const out=[]; const s=t.start_date||'0000', e=t.end_date||'9999'; const d=new Date(from); d.setHours(0,0,0,0);
+  const sdow=t.start_date?(new Date(t.start_date+'T00:00:00').getDay()+6)%7:4; const sday=t.start_date?new Date(t.start_date+'T00:00:00').getDate():1;
+  while(d<=to){ const k=ymd(d); const i=(d.getDay()+6)%7;
+    if(k>=s&&k<=e){ if(t.recur==='daily5'&&i<5) out.push(k); else if(t.recur==='daily6'&&i<6) out.push(k); else if(t.recur==='weekly'&&i===sdow) out.push(k); else if(t.recur==='monthly'&&d.getDate()===sday) out.push(k); }
+    d.setDate(d.getDate()+1); }
   return out; }
+async function ensureInstancesRange(from,to,tpl){ // 범위 내 인스턴스 로드 + 누락 생성
+  if(!tpl.length) return [];
+  const {data}=await db.from('task_instances').select('*').in('template_id',tpl.map(t=>t.id)).gte('due_date',ymd(from)).lte('due_date',ymd(to)); let list=data||[];
+  const missing=[]; tpl.forEach(t=>expectedDates(t,from,to).forEach(k=>{ if(!list.some(i=>i.template_id===t.id&&i.due_date===k)) missing.push({template_id:t.id,due_date:k,done:false}); }));
+  if(missing.length){ const {data:ins,error}=await db.from('task_instances').upsert(missing,{onConflict:'template_id,due_date',ignoreDuplicates:true}).select(); if(error){ console.error(error); alert('Rutinas / 반복 업무 오류:\n'+error.message); } else list=list.concat(ins||[]); }
+  return list; }
 async function ensureInstances(){
-  const tpl=TASKS.filter(t=>t.recur&&t.recur!=='none'); INST=[]; if(!tpl.length) return;
-  const mon=new Date(WEEK), sun=new Date(WEEK); sun.setDate(sun.getDate()+6);
-  const {data}=await db.from('task_instances').select('*').in('template_id',tpl.map(t=>t.id)).gte('due_date',ymd(mon)).lte('due_date',ymd(sun)); INST=data||[];
-  const missing=[]; tpl.forEach(t=>expectedDates(t,mon).forEach(k=>{ if(!INST.some(i=>i.template_id===t.id&&i.due_date===k)) missing.push({template_id:t.id,due_date:k,done:false}); }));
-  if(missing.length){ const {data:ins,error}=await db.from('task_instances').upsert(missing,{onConflict:'template_id,due_date',ignoreDuplicates:true}).select(); if(error){ console.error(error); alert('Rutinas / 반복 업무 오류:\n'+error.message); } else INST=INST.concat(ins||[]); }
+  const tpl=TASKS.filter(t=>t.recur&&t.recur!=='none'); const mon=new Date(WEEK), sun=new Date(WEEK); sun.setDate(sun.getDate()+6);
+  INST=await ensureInstancesRange(mon,sun,tpl);
 }
-async function toggleInst(id,el){ const {error}=await db.from('task_instances').update({done:el.checked,done_at:el.checked?new Date().toISOString():null,done_by:el.checked?ME.id:null}).eq('id',id);
-  if(error){ el.checked=!el.checked; return toast(error.message); } const i=INST.find(x=>x.id===id); if(i) i.done=el.checked; renderRoutineRates(); }
+async function toggleInst(id,el){ const i=INST.find(x=>x.id===id); if(!i) return; const nv=!i.done; const at=nv?new Date().toISOString():null;
+  const {error}=await db.from('task_instances').update({done:nv,done_at:at,done_by:nv?ME.id:null}).eq('id',id);
+  if(error) return toast(error.message); i.done=nv; i.done_at=at; renderAll(); }
+async function requestFb(taskId,on){ const row={task_id:taskId,week_key:weekKey(WEEK),author_id:ME.id,fb_requested:on};
+  const {data,error}=await db.from('weekly_updates').upsert(row,{onConflict:'task_id,week_key'}).select().single(); if(error) return toast(error.message);
+  const i=UPD.findIndex(x=>x.task_id===taskId); if(i>=0) UPD[i]=data; else UPD.push(data); toast(OT('saved')); renderAll(); }
 const mem=id=>MEMBERS.find(m=>m.id===id)||{name:'—',team_name:''};
 const memName=id=>mem(id).name;
-function visibleAll(){ if(isMgr()) return TASKS; if(isLead()) return TASKS; return TASKS.filter(t=>t.member_id===ME.id); }
+function visibleAll(){ if(isMgr()||isLead()) return TASKS; return TASKS.filter(t=>isOwner(t,ME.id)); }
 function visibleTasks(){ return visibleAll().filter(t=>!t.recur||t.recur==='none'); }
 function visibleRoutines(){ return visibleAll().filter(t=>t.recur&&t.recur!=='none'); }
 function teamNames(){ const s=new Set(); MEMBERS.forEach(m=>m.team_name&&s.add(m.team_name)); TASKS.forEach(t=>t.team_name&&s.add(t.team_name)); return [...s].sort(); }
@@ -553,7 +646,8 @@ function fillStatic(){
   fm.innerHTML=opt('',OT('all_members'))+activeMem.map(m=>opt(m.id,m.name)).join('');
   fs.innerHTML=opt('',OT('all_status'))+STATUSES.map(s=>opt(s,OS('st',s))).join('');
   [fm.value,fs.value]=keep;
-  document.getElementById('tMember').innerHTML=activeMem.map(m=>opt(m.id,m.name)).join('');
+  document.getElementById('tMembers').innerHTML=activeMem.map(m=>`<label><input type="checkbox" value="${m.id}"> ${esc(m.name)}</label>`).join('');
+  const cm=document.getElementById('calMember'); const ck=cm.value; cm.innerHTML=opt('',OT('all_members'))+activeMem.map(m=>opt(m.id,m.name)).join(''); cm.value=ck;
   document.getElementById('tStatus').innerHTML=STATUSES.map(s=>opt(s,OS('st',s))).join('');
   document.getElementById('tPriority').innerHTML=PRIOS.map(p=>opt(p,OS('pr',p),p==='media')).join('');
   document.getElementById('tRecur').innerHTML=RECURS.map(r=>opt(r,OS('rc',r))).join('');
@@ -564,12 +658,12 @@ function fillStatic(){
 function go(v){ VIEW=v; document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
   document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); renderAll(); }
 function renderAll(){ document.getElementById('weekLabel').textContent=weekLabel(WEEK); if(typeof showAlerts==='function'&&ME&&!document.getElementById('alertBox').classList.contains('hide')) showAlerts();
-  if(VIEW==='semana') renderWeek(); if(VIEW==='panel') renderPanel(); if(VIEW==='feedback') renderFb(); if(VIEW==='gantt') renderGantt(); if(VIEW==='eval') renderEval(); if(VIEW==='admin') renderAdmin(); updateFbCount(); }
+  if(VIEW==='semana') renderWeek(); if(VIEW==='panel') renderPanel(); if(VIEW==='feedback') renderFb(); if(VIEW==='gantt') renderGantt(); if(VIEW==='eval') renderEval(); if(VIEW==='cal') renderCal(); if(VIEW==='admin') renderAdmin(); updateFbCount(); }
 
 /* ===================== WEEK VIEW ===================== */
 function filteredTasks(){
   const fm=document.getElementById('fMember').value, fs=document.getElementById('fStatus').value, hd=document.getElementById('fHideDone').checked;
-  return visibleTasks().filter(t=>(!fm||String(t.member_id)===fm)&&(!fs||t.status===fs)&&!(hd&&t.status==='completado'));
+  return visibleTasks().filter(t=>(!fm||isOwner(t,fm))&&(!fs||t.status===fs)&&!(hd&&t.status==='completado'));
 }
 function taskCard(t){
   const u=UPD.find(x=>x.task_id===t.id)||{};
@@ -577,7 +671,7 @@ function taskCard(t){
     <div>
       <div class="title">${esc(t.title)}</div>
       <div class="meta"><span class="badge st-${t.status}">${BS('st',t.status)}</span><span class="pr pr-${t.priority}">${BS('pr',t.priority)}</span>
-        <span>${esc(memName(t.member_id))}</span></div>
+        <span>👤 ${esc(owners(t))}</span></div>
       <div class="bar"><i style="width:${t.progress}%"></i></div>
       <div class="meta"><span>${t.progress}%</span><span>${t.start_date||''} ~ ${t.end_date||''}</span>${dday(t.end_date)}</div>
       <div class="acts"><button class="btn sm" onclick="openTask(${t.id})">✏️ ${BL('edit')}</button><button class="btn sm" onclick="openHist(${t.id})">📊 ${BL('history')}</button></div>
@@ -605,20 +699,23 @@ function renderWeek(){
   const list=filteredTasks(); const box=document.getElementById('weekList');
   box.innerHTML=list.length?list.map(taskCard).join(''):`<div class="card empty">${BL('no_tasks')}</div>`;
   const fm=document.getElementById('fMember').value;
-  const rts=visibleRoutines().filter(t=>(!fm||String(t.member_id)===fm));
+  const rts=visibleRoutines().filter(t=>(!fm||isOwner(t,fm)));
   document.getElementById('routineSec').classList.toggle('hide',!rts.length);
   document.getElementById('routineList').innerHTML=rts.map(routineCard).join('');
 }
 function routineCard(t){
   const u=UPD.find(x=>x.task_id===t.id)||{}; const inst=INST.filter(i=>i.template_id===t.id).sort((a,b)=>a.due_date<b.due_date?-1:1);
   const todayK=ymd(new Date());
-  const days=inst.map(i=>{const d=new Date(i.due_date+'T00:00:00'); const dow=(d.getDay()+6)%7; const miss=!i.done&&i.due_date<todayK;
-    return `<label class="day ${miss?'miss':''} ${i.due_date===todayK?'today':''}"><input type="checkbox" ${i.done?'checked':''} onchange="toggleInst(${i.id},this)"><span>${ES('dow')[dow]} <small class="ko" style="margin:0">${KO('dow')[dow]}</small> ${d.getDate()}</span></label>`;}).join('');
+  const days=inst.map(i=>{const d=new Date(i.due_date+'T00:00:00'); const dow=(d.getDay()+6)%7; const miss=!i.done&&i.due_date<todayK; const fut=i.due_date>todayK;
+    const doneD=i.done&&i.done_at?i.done_at.slice(5,10).replace('-','/'):'';
+    return `<div class="day ${miss?'miss':''} ${fut?'future':''} ${i.due_date===todayK?'today':''}"><span>${ES('dow')[dow]} ${d.getDate()}</span><button class="${i.done?'done':''}" title="${i.done?ES('done_on')+' '+doneD:''}" onclick="toggleInst(${i.id},this)">${i.done?'✔':''}</button><span class="dt">${doneD||'&nbsp;'}</span></div>`;}).join('');
+  const req=u.fb_requested&&!u.feedback_type;
+  const reqBtn=canFeedback()?'':(u.feedback_type?'':(req?`<span class="fb-req">📨 ${BL('fb_requested')}</span> <button class="btn sm" onclick="requestFb(${t.id},false)">${BL('fb_cancel_req')}</button>`:`<button class="btn sm" onclick="requestFb(${t.id},true)">📨 ${BL('fb_request')}</button>`));
   return `<div class="rt" data-task="${t.id}">
     <div><div class="title">${esc(t.title)}</div>
-      <div class="meta"><span class="badge" style="background:var(--s-hold)">${BS('rc',t.recur)}</span><span class="pr pr-${t.priority}">${BS('pr',t.priority)}</span><span>${esc(memName(t.member_id))}</span></div>
+      <div class="meta"><span class="badge" style="background:var(--s-hold)">${BS('rc',t.recur)}</span><span class="pr pr-${t.priority}">${BS('pr',t.priority)}</span><span>👤 ${esc(owners(t))}</span></div>
       <div class="acts"><button class="btn sm" onclick="openTask(${t.id})">✏️ ${BL('edit')}</button><button class="btn sm" onclick="openHist(${t.id})">📊 ${BL('history')}</button></div></div>
-    <div><div class="days">${days||`<span class="muted small">—</span>`}</div><div class="rate" id="rate-${t.id}">${rateText(t.id)}</div>
+    <div><div class="days">${days||`<span class="muted small">—</span>`}</div><div class="rate" id="rate-${t.id}">${rateText(t.id)}</div><div class="acts" style="margin-top:8px">${reqBtn}${canFeedback()&&req?`<span class="fb-req">📨 ${BL('fb_requested')}</span>`:''}</div>
       <textarea data-f="done_text" placeholder="${OT('routine_note')}" onblur="saveUpd(${t.id},this)">${esc(u.done_text||'')}</textarea></div>
     <div><div class="head">${BL('col_fb')}</div>${fbCell(t,u)}</div>
   </div>`;
@@ -637,7 +734,7 @@ async function saveUpd(taskId,el){
 async function saveFb(taskId){
   const type=document.getElementById('fbt-'+taskId).value, text=document.getElementById('fbx-'+taskId).value.trim();
   if(!type) return toast(OT('fb_choose'));
-  const row={task_id:taskId,week_key:weekKey(WEEK),feedback_type:type,feedback_text:text,feedback_by:ME.id,feedback_at:new Date().toISOString(),read_at:null};
+  const row={task_id:taskId,week_key:weekKey(WEEK),feedback_type:type,feedback_text:text,feedback_by:ME.id,feedback_at:new Date().toISOString(),read_at:null,fb_requested:false};
   const {data,error}=await db.from('weekly_updates').upsert(row,{onConflict:'task_id,week_key'}).select().single();
   if(error) return toast(error.message);
   const i=UPD.findIndex(x=>x.task_id===taskId); if(i>=0) UPD[i]=data; else UPD.push(data);
@@ -665,7 +762,8 @@ function openTask(id){
   document.getElementById('mTaskTitle').innerHTML=t?`✏️ ${BL('edit')}`:BL('new_task').replace('+ ','');
   document.getElementById('tId').value=t?t.id:'';
   document.getElementById('tTitle').value=t?t.title:'';
-  document.getElementById('tMember').value=t?t.member_id:(ME.role==='gerente'?'':ME.id);
+  const ids=t?ownerIds(t):(ME.role==='gerente'?[]:[ME.id]);
+  document.querySelectorAll('#tMembers input').forEach(c=>{ c.checked=ids.includes(+c.value); c.disabled=(!canFeedback()&&+c.value===ME.id); });
   document.getElementById('tStatus').value=t?t.status:'planificado';
   document.getElementById('tPriority').value=t?t.priority:'media';
   document.getElementById('tProgress').value=t?t.progress:0;
@@ -674,15 +772,15 @@ function openTask(id){
   document.getElementById('tDesc').value=t?t.description:'';
   document.getElementById('tRecur').value=t?(t.recur||'none'):'none'; onRecurChange();
   document.getElementById('tDel').classList.toggle('hide',!t||!canFeedback());
-  document.getElementById('tMember').disabled=!canFeedback(); // 팀원은 본인 업무만
   openM('mTask');
 }
 function onRecurChange(){ const r=document.getElementById('tRecur').value; const rec=r!=='none';
   document.getElementById('fProgress').classList.toggle('hide',rec); document.getElementById('lEnd').innerHTML=rec?BL('end_until'):BL('end'); }
 async function saveTask(){
   const id=document.getElementById('tId').value; const g=i=>document.getElementById(i).value; const rec=g('tRecur')!=='none';
-  if(!g('tTitle').trim()||!g('tMember')||!g('tStart')||(!rec&&!g('tEnd'))) return toast(OT('req'));
-  const row={title:g('tTitle').trim(),member_id:+g('tMember'),status:g('tStatus'),priority:g('tPriority'),
+  const mids=[...document.querySelectorAll('#tMembers input:checked')].map(c=>+c.value);
+  if(!g('tTitle').trim()||!mids.length||!g('tStart')||(!rec&&!g('tEnd'))) return toast(OT('req'));
+  const row={title:g('tTitle').trim(),member_id:mids[0],member_ids:mids,status:g('tStatus'),priority:g('tPriority'),
     progress:rec?0:Math.max(0,Math.min(100,+g('tProgress')||0)),start_date:g('tStart'),end_date:g('tEnd')||null,recur:g('tRecur'),description:g('tDesc').trim()};
   const prev=id?TASKS.find(x=>String(x.id)===String(id)):null;
   if(rec){ if(row.status==='planificado'||row.status==='retrasado'||row.status==='completado') row.status='en_curso'; }
@@ -705,18 +803,18 @@ function renderPanel(){
   if(rts.length) k.push(['kpi_routines',rts.length,'var(--s-hold)']); if(rIn.length) k.push(['kpi_routine',Math.round(rIn.filter(i=>i.done).length/rIn.length*100)+'%','var(--s-hold)']);
   if(canFeedback()) k.push(['kpi_fb',pending,'var(--amber)']);
   document.getElementById('kpis').innerHTML=k.map(([l,v,c])=>`<div class="kpi" style="border-left-color:${c}"><div class="l">${BL(l)}</div><div class="v">${v}</div></div>`).join('');
-  drawMemberChart(ts); drawStatusChart(ts);
+  drawMemberChart(ts); drawStatusChart(ts); renderDailyGrid();
   const late=ts.filter(t=>t.status!=='completado'&&t.end_date).map(t=>({t,n:Math.round((new Date(t.end_date+'T00:00:00')-new Date().setHours(0,0,0,0))/86400000)})).filter(x=>x.n<=7).sort((a,b)=>a.n-b.n);
   document.getElementById('lateList').innerHTML=late.length?`<table class="t"><tr><th>${BL('col_task')}</th><th>${BL('member')}</th><th>${BL('status')}</th><th>%</th><th>${BL('end')}</th><th></th></tr>`+
-    late.map(({t,n})=>`<tr><td>${esc(t.title)}</td><td>${esc(memName(t.member_id))}</td><td><span class="badge st-${t.status}">${BS('st',t.status)}</span></td><td>${t.progress}</td><td>${t.end_date}</td><td>${dday(t.end_date)}</td></tr>`).join('')+'</table>':`<p class="muted small">${BL('nothing')}</p>`;
+    late.map(({t,n})=>`<tr><td>${esc(t.title)}</td><td>${esc(owners(t))}</td><td><span class="badge st-${t.status}">${BS('st',t.status)}</span></td><td>${t.progress}</td><td>${t.end_date}</td><td>${dday(t.end_date)}</td></tr>`).join('')+'</table>':`<p class="muted small">${BL('nothing')}</p>`;
   const today=ymd(new Date());
   document.getElementById('routinePanel').innerHTML=rts.length?`<table class="t"><tr><th>${BL('col_task')}</th><th>${BL('member')}</th><th>${BL('recur')}</th><th>${BL('cumplido')}</th><th>%</th></tr>`+
     rts.map(t=>{const a=INST.filter(i=>i.template_id===t.id&&i.due_date<=today); const n=a.filter(i=>i.done).length; const pct=a.length?Math.round(n/a.length*100):null;
-      return `<tr><td>${esc(t.title)}</td><td>${esc(memName(t.member_id))}</td><td>${BS('rc',t.recur)}</td><td>${n}/${a.length}</td><td>${pct===null?'—':`<span class="badge" style="background:${pct>=80?'var(--s-done)':pct>=50?'var(--amber)':'var(--s-late)'}">${pct}%</span>`}</td></tr>`;}).join('')+'</table>':`<p class="muted small">${BL('nothing')}</p>`;
+      return `<tr><td>${esc(t.title)}</td><td>${esc(owners(t))}</td><td>${BS('rc',t.recur)}</td><td>${n}/${a.length}</td><td>${pct===null?'—':`<span class="badge" style="background:${pct>=80?'var(--s-done)':pct>=50?'var(--amber)':'var(--s-late)'}">${pct}%</span>`}</td></tr>`;}).join('')+'</table>':`<p class="muted small">${BL('nothing')}</p>`;
 }
 function drawMemberChart(ts){
   const c=document.getElementById('cMember'); const ctx=c.getContext('2d'); const W=c.width=c.parentElement.clientWidth-28, H=c.height=Math.max(160,MEMBERS.length*26);
-  ctx.clearRect(0,0,W,H); const rows=MEMBERS.filter(m=>m.active&&m.role!=='gerente').map(m=>{const mt=ts.filter(t=>t.member_id===m.id);return{m,tot:mt.length,done:mt.filter(t=>t.status==='completado').length,late:mt.filter(t=>t.status==='retrasado').length};}).filter(r=>r.tot);
+  ctx.clearRect(0,0,W,H); const rows=MEMBERS.filter(m=>m.active&&m.role!=='gerente').map(m=>{const mt=ts.filter(t=>isOwner(t,m.id));return{m,tot:mt.length,done:mt.filter(t=>t.status==='completado').length,late:mt.filter(t=>t.status==='retrasado').length};}).filter(r=>r.tot);
   const max=Math.max(1,...rows.map(r=>r.tot)); const lw=90, bw=W-lw-40; ctx.font='12px sans-serif'; ctx.textBaseline='middle';
   rows.forEach((r,i)=>{const y=14+i*26; ctx.fillStyle='#1B2430'; ctx.textAlign='right'; ctx.fillText(r.m.name.slice(0,12),lw-8,y);
     ctx.fillStyle='#D9DFE4'; ctx.fillRect(lw,y-8,bw*r.tot/max,16); ctx.fillStyle='#2E8B57'; ctx.fillRect(lw,y-8,bw*r.done/max,16);
@@ -733,11 +831,53 @@ function drawStatusChart(ts){
   ctx.font='12px sans-serif'; ctx.textAlign='left'; STATUSES.forEach((s,i)=>{const y=30+i*30; ctx.fillStyle=col[s]; ctx.fillRect(200,y-6,12,12); ctx.fillStyle='#1B2430'; ctx.fillText(`${ES('st')[s]} ${KO('st')[s]}  ${ts.filter(t=>t.status===s).length}`,220,y);});
 }
 
+function shiftPanelMonth(n){ PMONTH=new Date(PMONTH.getFullYear(),PMONTH.getMonth()+n,1); renderDailyGrid(); }
+async function renderDailyGrid(){
+  const a=new Date(PMONTH), b=new Date(PMONTH.getFullYear(),PMONTH.getMonth()+1,0); const nd=b.getDate(); const todayK=ymd(new Date());
+  document.getElementById('panelMonthLabel').textContent=`${a.getFullYear()}-${String(a.getMonth()+1).padStart(2,'0')}`;
+  const daily=visibleRoutines().filter(t=>t.recur==='daily5'||t.recur==='daily6'); const box=document.getElementById('dailyGrid');
+  if(!daily.length){ box.innerHTML=`<p class="muted small">${BL('nothing')}</p>`; return; }
+  const inst=await ensureInstancesRange(a,b,daily);
+  let head='<tr><th style="text-align:left;padding:0 8px">'+BL('col_task')+'</th>';
+  for(let d=1;d<=nd;d++){ const dt=new Date(a.getFullYear(),a.getMonth(),d); const k=ymd(dt); const i=(dt.getDay()+6)%7; head+=`<th class="${i>=5?'we':''} ${k===todayK?'today':''}">${d}<br><span style="font-weight:400">${ES('dow')[i][0]}</span></th>`; }
+  head+='<th>%</th></tr>';
+  const rows=daily.map(t=>{ let cells='',tot=0,ok=0;
+    for(let d=1;d<=nd;d++){ const dt=new Date(a.getFullYear(),a.getMonth(),d); const k=ymd(dt); const i=(dt.getDay()+6)%7; const r=inst.find(x=>x.template_id===t.id&&x.due_date===k);
+      let cls=i>=5?'we':'', txt='';
+      if(r){ if(r.done){cls+=' ok';txt='✔';ok++;tot++;} else if(k<todayK){cls+=' miss';txt='✖';tot++;} else if(k===todayK){cls+=' today';} }
+      else cls+=' na';
+      cells+=`<td class="${cls}" title="${k}${r&&r.done&&r.done_at?' · '+r.done_at.slice(0,10):''}">${txt}</td>`; }
+    const pct=tot?Math.round(ok/tot*100):null;
+    return `<tr><td class="name" title="${esc(t.title)}">${esc(t.title)}<br><span class="muted">${esc(owners(t))}</span></td>${cells}<td class="rate">${pct===null?'—':pct+'%'}</td></tr>`; }).join('');
+  box.innerHTML=`<table class="dgrid">${head}${rows}</table>`;
+}
+
+/* ===================== CALENDARIO ===================== */
+function shiftCal(n){ if(n===0) CAL=new Date(new Date().getFullYear(),new Date().getMonth(),1); else CAL=new Date(CAL.getFullYear(),CAL.getMonth()+n,1); renderCal(); }
+async function renderCal(){
+  const a=new Date(CAL), b=new Date(CAL.getFullYear(),CAL.getMonth()+1,0); const todayK=ymd(new Date()); const fm=document.getElementById('calMember').value;
+  document.getElementById('calLabel').textContent=`${a.getFullYear()}-${String(a.getMonth()+1).padStart(2,'0')}`;
+  const tasks=visibleTasks().filter(t=>!fm||isOwner(t,fm)); const showRt=document.getElementById('calRoutines').checked;
+  const rts=showRt?visibleRoutines().filter(t=>!fm||isOwner(t,fm)):[];
+  const inst=rts.length?await ensureInstancesRange(a,b,rts):[];
+  const first=new Date(a); first.setDate(1-((a.getDay()+6)%7)); const cells=[]; const cur=new Date(first);
+  while(cells.length<42){ cells.push(new Date(cur)); cur.setDate(cur.getDate()+1); if(cells.length>=35&&cur>b) break; }
+  let html=ES('dow').map((d,i)=>`<div class="dh">${d} <small class="ko">${KO('dow')[i]}</small></div>`).join('');
+  cells.forEach(dt=>{ const k=ymd(dt); const out=dt.getMonth()!==a.getMonth(); const i=(dt.getDay()+6)%7;
+    const ends=tasks.filter(t=>t.end_date===k), starts=tasks.filter(t=>t.start_date===k&&t.end_date!==k);
+    const ri=inst.filter(x=>x.due_date===k);
+    html+=`<div class="dc ${out?'out':''} ${i>=5?'we':''} ${k===todayK?'today':''}"><div class="dn">${dt.getDate()}</div>`+
+      ends.map(t=>`<span class="ev st-${t.status}" onclick="openTask(${t.id})" title="${esc(t.title)} · ${esc(owners(t))}">● ${esc(t.title)}</span>`).join('')+
+      starts.map(t=>`<span class="ev start" onclick="openTask(${t.id})" title="${esc(t.title)}">▷ ${esc(t.title)}</span>`).join('')+
+      ri.map(x=>{const t=rts.find(r=>r.id===x.template_id); return `<span class="ev rt" style="${x.done?'':'opacity:.55'}" title="${esc(t.title)}">${x.done?'✔':'○'} ${esc(t.title)}</span>`;}).join('')+`</div>`; });
+  document.getElementById('calBox').innerHTML=`<div class="cal">${html}</div>`;
+}
+
 /* ===================== FEEDBACK QUEUE ===================== */
 function fbQueue(){ // 피드백 대기 업무 목록 (task 배열)
   const out=[]; visibleAll().forEach(t=>{ const u=UPD.find(x=>x.task_id===t.id)||{}; if(u.feedback_type) return;
     const isR=t.recur&&t.recur!=='none';
-    if(isR){ if(INST.some(i=>i.template_id===t.id)) out.push(t); } else if(u.done_text||u.plan_text) out.push(t); });
+    if(isR){ if(u.fb_requested) out.push(t); } else if(u.done_text||u.plan_text||u.fb_requested) out.push(t); });
   return out; }
 function updateFbCount(){ const el=document.getElementById('fbCount'); if(!canFeedback()){el.classList.add('hide');return;} const n=fbQueue().length; el.textContent=n; el.classList.toggle('hide',!n); }
 function renderFb(){
@@ -745,23 +885,28 @@ function renderFb(){
   box.innerHTML=q.length?q.map(t=>t.recur&&t.recur!=='none'?routineCard(t):taskCard(t)).join(''):`<div class="card empty">${BL('all_done')}</div>`;
   const upd=new Set(UPD.filter(u=>u.done_text||u.plan_text).map(u=>u.task_id));
   const none=visibleTasks().filter(t=>t.status!=='completado'&&t.status!=='en_espera'&&!upd.has(t.id));
-  const byM={}; none.forEach(t=>{(byM[memName(t.member_id)]=byM[memName(t.member_id)]||[]).push(t.title);});
+  const byM={}; none.forEach(t=>{ownerIds(t).forEach(id=>{(byM[memName(id)]=byM[memName(id)]||[]).push(t.title);});});
   document.getElementById('noUpdList').innerHTML=Object.keys(byM).length?Object.entries(byM).map(([m,ts])=>`<div style="margin:4px 0"><b>${esc(m)}</b> (${ts.length}) — ${ts.map(esc).join(' · ')}</div>`).join(''):`<span class="muted">${BL('nothing')}</span>`;
 }
 
 /* ===================== GANTT ===================== */
-function renderGantt(){
+let GINST=[];
+async function renderGantt(){
   const start=weekMonday(new Date()); start.setDate(start.getDate()-21); const weeks=10; const end=new Date(start); end.setDate(start.getDate()+weeks*7);
+  { const ids=visibleRoutines().map(t=>t.id); if(ids.length){ const {data}=await db.from('task_instances').select('*').in('template_id',ids).gte('due_date',ymd(start)).lte('due_date',ymd(end)); GINST=data||[]; } else GINST=[]; }
   const endK=ymd(end);
   const ts=visibleTasks().filter(t=>t.start_date&&t.end_date).sort((a,b)=>a.start_date<b.start_date?-1:1)
-    .concat(visibleRoutines().filter(t=>t.start_date).map(t=>({...t,_r:true,end_date:t.end_date||endK})));
+    .concat(visibleRoutines().map(t=>({...t,_r:true})));
   const span=end-start; const pct=d=>Math.max(0,Math.min(100,(new Date(d+'T00:00:00')-start)/span*100));
   const curKey=weekKey(new Date());
   let head='<div class="wkhead">'; for(let i=0;i<weeks;i++){const d=new Date(start); d.setDate(start.getDate()+i*7); head+=`<span class="${weekKey(d)===curKey?'cur':''}">${fmtD(d)}</span>`;} head+='</div>';
   const todayPct=(new Date().setHours(0,0,0,0)-start)/span*100;
   document.getElementById('ganttBox').innerHTML=ts.length?`<div class="gantt"><div class="lbl" style="font-weight:600">${BL('col_task')}</div>${head}`+
-    ts.map(t=>{const l=pct(t.start_date), r=pct(t.end_date); const w=Math.max(1,r-l); if(t._r){ const a=INST.filter(i=>i.template_id===t.id&&i.due_date<=ymd(new Date())); t.progress=a.length?Math.round(a.filter(i=>i.done).length/a.length*100):0; }
-      return `<div class="lbl" title="${esc(t.title)}"><span class="badge ${t._r?'':'st-'+t.status}" style="font-size:10px;padding:0 5px;${t._r?'background:var(--s-hold)':''}">${t._r?ES('rc')[t.recur]:ES('st')[t.status]}</span> ${esc(t.title)} <span class="muted">· ${esc(memName(t.member_id))}</span></div>
+    ts.map(t=>{ if(t._r){ const dayW=100/(weeks*7); const todayK=ymd(new Date());
+        const blocks=GINST.filter(i=>i.template_id===t.id).map(i=>{const k=i.done?'done':(i.due_date<todayK?'miss':''); const dd=i.done&&i.done_at?i.done_at.slice(0,10):i.due_date; return `<div class="inst ${k}" style="left:${pct(dd)}%;width:${Math.max(0.6,dayW-0.25)}%" title="${dd}${i.done?' ✔':''}"></div>`;}).join('');
+        return `<div class="lbl" title="${esc(t.title)}"><span class="badge" style="font-size:10px;padding:0 5px;background:var(--s-hold)">${ES('rc')[t.recur]}</span> ${esc(t.title)} <span class="muted">· ${esc(owners(t))}</span></div><div class="row">${blocks}<div class="today" style="left:${todayPct}%"></div></div>`; }
+      const l=pct(t.start_date), r=pct(t.end_date); const w=Math.max(1,r-l);
+      return `<div class="lbl" title="${esc(t.title)}"><span class="badge st-${t.status}" style="font-size:10px;padding:0 5px">${ES('st')[t.status]}</span> ${esc(t.title)} <span class="muted">· ${esc(owners(t))}</span></div>
       <div class="row"><div class="gbar ${t.status}" style="left:${l}%;width:${w}%" title="${t.start_date}~${t.end_date} ${t.progress}%"><i style="width:${t.progress}%"></i></div><div class="today" style="left:${todayPct}%"></div></div>`;}).join('')+'</div>':`<div class="empty">${BL('no_tasks')}</div>`;
 }
 
@@ -777,16 +922,16 @@ async function renderEval(){
     db.from('task_instances').select('*').gte('due_date',a).lte('due_date',b),
     db.from('weekly_updates').select('*').in('week_key',weekKeysIn(a,b))]);
   const today=ymd(new Date()); const todayMs=new Date(today+'T00:00:00').getTime();
-  const tplOwner=new Map(TASKS.map(t=>[t.id,t.member_id]));
+  const tplOwner=new Map(TASKS.map(t=>[t.id,ownerIds(t)])); const has=(tid,mid)=>(tplOwner.get(tid)||[]).includes(mid);
   EVAL=MEMBERS.filter(m=>m.active&&m.role!=='gerente').map(m=>{
-    const due=TASKS.filter(t=>(!t.recur||t.recur==='none')&&t.member_id===m.id&&t.end_date&&t.end_date>=a&&t.end_date<=b&&(t.end_date<=today||t.status==='completado')); // 아직 마감 안 된 미완료 업무는 제외
+    const due=TASKS.filter(t=>(!t.recur||t.recur==='none')&&isOwner(t,m.id)&&t.end_date&&t.end_date>=a&&t.end_date<=b&&(t.end_date<=today||t.status==='completado')); // 아직 마감 안 된 미완료 업무는 제외
     const rows=due.map(t=>{ const closed=t.completed_at?t.completed_at.slice(0,10):null; const endMs=new Date(t.end_date+'T00:00:00').getTime();
       const refMs=closed?new Date(closed+'T00:00:00').getTime():(t.status==='completado'?endMs:todayMs);
       const delay=Math.max(0,Math.round((refMs-endMs)/86400000)); return {t,closed,delay,ontime:t.status==='completado'&&delay===0}; });
     const done=rows.filter(r=>r.t.status==='completado').length, ontime=rows.filter(r=>r.ontime).length, lateOpen=rows.filter(r=>r.t.status==='retrasado').length;
     const delays=rows.map(r=>r.delay); const avgDelay=delays.length?+(delays.reduce((x,y)=>x+y,0)/delays.length).toFixed(1):0; const maxDelay=delays.length?Math.max(...delays):0;
-    const ri=(insts||[]).filter(i=>tplOwner.get(i.template_id)===m.id&&i.due_date<=today); const rRate=ri.length?Math.round(ri.filter(i=>i.done).length/ri.length*100):null;
-    const fb={bien:0,ajustar:0,apoyo:0,replanificar:0}; (upds||[]).forEach(u=>{ if(tplOwner.get(u.task_id)===m.id&&u.feedback_type) fb[u.feedback_type]++; });
+    const ri=(insts||[]).filter(i=>has(i.template_id,m.id)&&i.due_date<=today); const rRate=ri.length?Math.round(ri.filter(i=>i.done).length/ri.length*100):null;
+    const fb={bien:0,ajustar:0,apoyo:0,replanificar:0}; (upds||[]).forEach(u=>{ if(has(u.task_id,m.id)&&u.feedback_type) fb[u.feedback_type]++; });
     const onRate=rows.length?Math.round(ontime/rows.length*100):null;
     const score=(rows.length||ri.length)?Math.round((onRate===null?EVAL_W.ontime:onRate/100*EVAL_W.ontime)+(rRate===null?EVAL_W.routine:rRate/100*EVAL_W.routine)+(1-Math.min(avgDelay/EVAL_W.delayCap,1))*EVAL_W.delay):null;
     return {m,rows,due:rows.length,done,ontime,onRate,lateOpen,avgDelay,maxDelay,rRate,fb,score};
