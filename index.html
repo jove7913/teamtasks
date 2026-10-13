@@ -423,7 +423,7 @@ small.ko{font-size:.78em;font-weight:400;opacity:.72;margin-left:5px;white-space
    ===================================================================== */
 const SUPABASE_URL = 'https://iikkadzumopjswhzkwqw.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlpa2thZHp1bW9wanN3aHprd3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2Njk1NDQsImV4cCI6MjEwNTI0NTU0NH0.WS1hNsYhPWWIOhsdodcy1wpMK08rF2X15WeTTluOygY';
-const APP_VERSION='1.7';
+const APP_VERSION='1.8';
 const DEMO = SUPABASE_URL.includes('YOUR-PROJECT');   // 키를 넣기 전에는 자동으로 데모 모드 (브라우저 저장, 샘플 데이터)
 
 /* ---------- 데모 모드: Supabase 없이 브라우저(localStorage)에서 동작 ---------- */
@@ -684,7 +684,7 @@ function fillStatic(){
   fm.innerHTML=opt('',OT('all_members'))+activeMem.map(m=>opt(m.id,m.name)).join('');
   fs.innerHTML=opt('',OT('all_status'))+STATUSES.map(s=>opt(s,OS('st',s))).join('');
   [fm.value,fs.value]=keep;
-  document.getElementById('tMembers').innerHTML=activeMem.map(m=>`<label><input type="checkbox" value="${m.id}"> ${esc(m.name)}</label>`).join('');
+  document.getElementById('tMembers').innerHTML=MEMBERS.filter(m=>m.active).map(m=>`<label><input type="checkbox" value="${m.id}"> ${esc(m.name)}</label>`).join('');
   const cm=document.getElementById('calMember'); const ck=cm.value; cm.innerHTML=opt('',OT('all_members'))+activeMem.map(m=>opt(m.id,m.name)).join(''); cm.value=ck;
   document.getElementById('tStatus').innerHTML=STATUSES.map(s=>opt(s,OS('st',s))).join('');
   document.getElementById('tPriority').innerHTML=PRIOS.map(p=>opt(p,OS('pr',p),p==='media')).join('');
@@ -795,8 +795,8 @@ async function openHist(taskId){
 }
 
 /* ===================== TASK CRUD ===================== */
-function openTask(id){
-  const t=id?TASKS.find(x=>x.id===id):null; fillStatic();
+async function openTask(id){
+  const t=id?TASKS.find(x=>x.id===id):null; await loadMembers(); fillStatic();
   document.getElementById('mTaskTitle').innerHTML=t?`✏️ ${BL('edit')}`:BL('new_task').replace('+ ','');
   document.getElementById('tId').value=t?t.id:'';
   document.getElementById('tTitle').value=t?t.title:'';
